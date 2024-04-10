@@ -1,6 +1,6 @@
 Show formula for:
 
-$\hspace{30pt}$ $\sum\limits_{i=1}^n i^k$ = $\text{..}\cdot n^{k+1} \text{ }+\text{ } \text{..}\cdot n^k \text{ }+\text{ ...}$
+$\hspace{30pt}$ $\Large{\sum\limits_{i=1}^n i^k \hspace{5pt}=\hspace{5pt} \text{..}\cdot n^{k+1} \text{ }+\text{ } \text{..}\cdot n^k \text{ }+\text{ ...}}$
 
 $\text{ }$
 
