@@ -6,8 +6,7 @@ def show_powers(n):
     pascal[0] = 1
     pascal[1] = 1
 
-    bernuli = [Fraction(0, 1)]*n
-    bernuli[0]=1
+    bernuli = [Fraction(1)]*n
 
     for poww in range(2, n+1):
         temp = pascal[0]
