@@ -1,11 +1,11 @@
 from fractions import Fraction
 
+
 def show_powers(n):
     pascal = [0]*(n+1)
     pascal[0] = 1
     pascal[1] = 1
 
-    pos = 1
     bernuli = [Fraction(0, 1)]*n
     bernuli[0]=1
 
@@ -16,21 +16,21 @@ def show_powers(n):
             tt = temp + pascal[j]
             temp = pascal[j]
             pascal[j] = tt
-        # now have (a+b)^poww
+        # now have pascal : (a+b)^poww
 
-        sum = Fraction(1)
-        for i in range(1, poww-1):
-            sum += pascal[i]*bernuli[i]
+        print("SUM_[1,n] i^", poww, ' = ', sep='', end='')
+        sum = Fraction(0)
+        for i in range(poww-1):
+            val = pascal[i]*bernuli[i]
+            sum += val
 
-        bernuli[pos] = -sum/poww
-        pos += 1
+            sign = 1 - 2 * int(i == 1)
+            print(Fraction(sign*val, poww), '*n^', poww - i, ' + ', end='', sep='')
 
-        print("SUM_[1,n] i^", poww, ' = ', sep='', end = '')
-        for i in range(0, pos-1):
-            sign = 1 - 2*int(i == 1)
-            print(Fraction(sign*pascal[i]*bernuli[i], poww), '*n^', poww-i,' + ', end='', sep='')
-        sign = 1 - 2 * int(pos-1 == 1)
-        print(Fraction(sign*pascal[pos-1] * bernuli[pos-1], poww), '*n', sep='')
+        bernuli[poww-1] = -sum / poww
+
+        sign = 1 - 2 * int(poww-1 == 1)
+        print(Fraction(sign * pascal[poww-1] * bernuli[poww-1], poww), '*n', sep='')
 
 
 # ===== [ EXAMPLE ] ====================================================================
