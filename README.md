@@ -5,3 +5,4 @@ Show formula for: $\hspace{30pt}$ $\Large{\sum\limits_{i=1}^n i^k \hspace{5pt}=\
 
 $\text{ }$
 
+---
