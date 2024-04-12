@@ -7,4 +7,6 @@ $\text{ }$
 
 ---
 
-* **N'th prefix sum**
+* **[N'th prefix sum](https://github.com/rfldxx/Simple_projects/tree/main/N'th%20prefix%20sum)**
+
+Calculated $n$ times prefix sum in one pass of data
