@@ -34,7 +34,7 @@ III  |  1  |  3  |   6  |  10  |  15
 * в ```  I``` у нас на каждой позиции ```  I[i]``` $=$ $1$ $\hspace{50pt}$ $\hspace{17pt}$ $\Rightarrow$  $\hspace{5pt}$ значение ``` II[n]``` $=$ ```I[0] + ... + I[n]``` $=$ $\sum\limits_{i=1}^n i^0$ $=$ $n$
 * в ``` II``` у нас на каждой позиции ``` II[i]``` $=$ $i$ $\hspace{50pt}$ $\hspace{18pt}$ $\Rightarrow$  $\hspace{5pt}$ значение ```III[n]```  $=$ $\hspace{8pt}$ $\sum\limits_{i=1}^n i^1$ $=$ $\frac{1}{2}n^2 + \frac{1}{2}n$
 * в ```III``` у нас на каждой позиции ```III[i]``` $=$ $\frac{1}{2}i^2 + \frac{1}{2}i$  $\hspace{5pt}$ $\Rightarrow$  $\hspace{5pt}$ значение ``` IV[n]```  $=$ $\frac{1}{2}\sum\limits_{i=1}^n i^2 + \frac{1}{2}\sum\limits_{i=1}^n i^1$ $=$ ... 
-#### $\hspace{50pt}$ $\Rightarrow$  $\hspace{5pt}$ в $n$ строчке многочлен степени $n-1$ 
+#### $\hspace{50pt}$ $\Rightarrow$  $\hspace{5pt}$ в $n$ строчке многочлен степени $n-1$ (надо было нумеровать с нуля ...)
 ```
 table:
      |  1  |  0  |   0  |   0  |   0
