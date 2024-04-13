@@ -35,12 +35,11 @@ def save_powers(table, n):
 
 
 
-def nth_iteration(data, N):
+def prepare_nth_iteration(N):
     table = [[Fraction(0)]*N for _ in range(N)]
     table[0][0] = Fraction(1)
 
     save_powers(table, N)
-
 
     ray = [Fraction(0)]*N
     ray[0] = Fraction(1)
@@ -67,7 +66,7 @@ def nth_iteration(data, N):
 
     print("  n : ", end='')
     for t in range(1, 11):
-        print("%8d" % (t), end = '')
+        print("%10d" % (t), end = '')
     print("\nf(n): ", end='')
     for t in range(1, 11):
         ans = Fraction(0)
@@ -76,6 +75,28 @@ def nth_iteration(data, N):
             ans += ray[N-1-j] * pow
             pow *= t
 
-        print("%8d" % (ans), end = '')
+        print("%10d" % (ans), end = '')
 
-nth_iteration(0, 5)
+    return ray
+
+def sum_of_nth_iteration(data, N):
+    if(N == 0):
+        return sum(data)
+
+    ray = prepare_nth_iteration(N)
+    ans = 0
+    for n in range(len(data)):
+        coef = 0
+        pow = Fraction(n+1)
+        for j in range(N):
+            coef += ray[N - 1 - j] * pow
+            pow  *= (n+1)
+
+        ans += coef * data[len(data)-1 - n]
+
+    return ans
+
+
+data = [9, 11, 4, 6, 4, 2]
+ans = sum_of_nth_iteration(data, 4)
+print('\nFOR data: ', data, '\nANS:      ', ans)
