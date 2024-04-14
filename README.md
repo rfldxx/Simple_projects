@@ -15,4 +15,4 @@ Calculated $n$ times prefix sum in one pass of data
 
 $\text{ }$
 
-![](https://count.getloli.com/get/@ice1000?theme=moebooru)
+![:name](https://count.getloli.com/get/@:rfldxx)
