@@ -15,4 +15,15 @@ Calculated $n$ times prefix sum in one pass of data
 
 $\text{ }$
 
+* **[Тренировки по алгоритмам 5.0 (by yandex)](https://github.com/rfldxx/Simple_projects/tree/main/N'th%20prefix%20sum)**
+
+Четыре, достаточно, начинающие темы - на каждую по 10 задач и неделя решения
+
+---
+
+
+![:name](https://www.codewars.com/users/Rei_00/badges/large)
+
+$\text{ }$
+
 ![:name](https://count.getloli.com/get/@:rfldxx)
