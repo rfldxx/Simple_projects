@@ -1,4 +1,5 @@
-[Тренировки по алгоритмам 5.0](https://yandex.ru/yaintern/algorithm-training)
+## [Тренировки по алгоритмам 5.0](https://yandex.ru/yaintern/algorithm-training)
+
 Рассматривались темы:
   - Сложность, тестирование, особые случаи
   - Линейный поиск
