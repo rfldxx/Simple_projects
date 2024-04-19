@@ -15,7 +15,7 @@ Calculated $n$ times prefix sum in one pass of data
 
 $\text{ }$
 
-* **[Тренировки по алгоритмам 5.0 (by yandex)](https://github.com/rfldxx/Simple_projects/tree/main/N'th%20prefix%20sum)**
+* **[Тренировки по алгоритмам 5.0 (by yandex)](https://github.com/rfldxx/Simple_projects/tree/main/Yandex%20algorithm%20training%205.0)**
 
 Четыре, достаточно, начинающие темы - на каждую по 10 задач и неделя решения
 
