@@ -8,4 +8,4 @@
 
 ---
 
-<img src="certificat.png" alt="certificat.png" style="width:300px;"/>
+<img src="certificat.png" alt="certificat.png" style="width:500px;"/>
