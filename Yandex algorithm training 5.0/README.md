@@ -6,3 +6,6 @@
   - Множества и словари
   - Бинарный поиск
 
+---
+
+<img src="certificat.png" alt="certificat.png" style="width:300px;"/>
