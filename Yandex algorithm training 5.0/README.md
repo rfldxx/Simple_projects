@@ -9,3 +9,5 @@
 ---
 
 <img src="certificat.png" alt="certificat.png" style="width:500px;"/>
+
+Заголовок-ссылка направляет на сайт "тренировок", там в конце страницы есть [таблица](https://yastatic.net/s3/anytask/shmya/Trenirovki_po_algoritmam_5_0.xlsx) (можно убедиться).
