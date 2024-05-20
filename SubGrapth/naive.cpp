@@ -130,7 +130,7 @@ bool test_water() {
       OK(water)
 }
 
-bool test_benzol() { // типо бензол - вместо -H подвещено -O-H
+bool test_benzol() { // типо бензол, но вместо -H подвещено -O-H
     auto benzol = unit<18>("COCOCOCOCOCOHHHHHH", 
                     {{1, 2},    {3, 4},  {5, 6},    {7, 8},  {9, 10},    {11, 12},  // C-H
                      {1, 3, 2}, {3, 5},  {5, 7, 2}, {7, 9},  {9, 11, 2}, {11, 1 },  // C-C или C=C
