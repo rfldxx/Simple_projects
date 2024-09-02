@@ -114,31 +114,31 @@ FORSIDE(filling)
 }
 
 
-ostream& operator << (ostream& out, const cube& cube) /* const */ {
-    #define CRINGEITERATION for(int i = 0, lvl = 0, add = 1; i < cube.n; (i == (cube.n+1)/2-1 ? (add = -1, lvl += !(cube.n&1)) : (int)0 ), lvl += add, i++)
+ostream& operator << (ostream& out, const cube& _) /* const */ {
+    #define CRINGEITERATION for(int i = 0, lvl = 0, add = 1; i < _.n; (i == (_.n+1)/2-1 ? (add = -1, lvl += !(_.n&1)) : (int)0 ), lvl += add, i++)
 
     //    | us | 
-    out << string(cube.lineout_size()+2, ' ') << string(cube.lineout_size(), '-') << "\n";
+    out << string(_.lineout_size()+2, ' ') << string(_.lineout_size(), '-') << "\n";
     CRINGEITERATION {
-        out << string(cube.lineout_size()+1, ' ') << "|" << cube.lineout(cube.us, i, lvl, add).str() << "|\n";
+        out << string(_.lineout_size()+1, ' ') << "|" << _.lineout(_.us, i, lvl, add).str() << "|\n";
     }
-    for(int i = 0; i < 4; i++) out << " " << string(cube.lineout_size(), '-');
+    for(int i = 0; i < 4; i++) out << " " << string(_.lineout_size(), '-');
     out << "\n";
 
     // ls | fs | rs | bs
     CRINGEITERATION {
-        for(auto side : ((const vector<int>* []){&cube.ls, &cube.fs, &cube.rs, &cube.bs}))
-            out << "|" << cube.lineout(*side, i, lvl, add).str();
+        for(auto side : ((const vector<int>* []){&_.ls, &_.fs, &_.rs, &_.bs}))
+            out << "|" << _.lineout(*side, i, lvl, add).str();
         out << "|\n"; 
     }
 
     //    | ds |
-    for(int i = 0; i < 4; i++) out << " " << string(cube.lineout_size(), '-');
+    for(int i = 0; i < 4; i++) out << " " << string(_.lineout_size(), '-');
     out << "\n";
     CRINGEITERATION {
-        out << string(cube.lineout_size()+1, ' ') << "|" << cube.lineout(cube.ds, i, lvl, add).str() << "|\n";
+        out << string(_.lineout_size()+1, ' ') << "|" << _.lineout(_.ds, i, lvl, add).str() << "|\n";
     }
-    out << string(cube.lineout_size()+2, ' ') << string(cube.lineout_size(), '-') << "\n";
+    out << string(_.lineout_size()+2, ' ') << string(_.lineout_size(), '-') << "\n";
 
     return out;
     #undef CRINGEITERATION
