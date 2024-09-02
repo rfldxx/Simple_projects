@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <string>
+#include <sstream>
 
 template<typename T, typename... Args>
 void cycle_swap(T& first, Args&... args) {
@@ -15,7 +17,7 @@ public:
 #define DOTS(a, b) , a(N*N, b)
     cube(unsigned N) : n(N) FORSIDE(DOTS) {} 
 
-    // bool operator ! () {
+    // bool operator ! () const {
 
     // }
 
@@ -23,34 +25,29 @@ public:
     ostream& operator << (ostream& out) /* const */ {
         #define CRINGEITERATION for(int i = 0, lvl = 0, add = 1; i < n; (i == (n+1)/2-1 ? (add = -1, lvl += !(n&1)) : (int)0 ), lvl += add, i++)
 
-        us[30] = 0;
-
-        //   | us | 
+        //    | us | 
+        out << string(lineout_size()+2, ' ') << string(lineout_size(), '-') << "\n";
         CRINGEITERATION {
-            #define CCC(a, b) out << "|"; lineout(out, a, i, lvl, add);
-            FORSIDE(CCC);
-            // lineout(out, fs, i, lvl, add);
-
-            // out << "   ";
-            // lineout(out, fs, i, lvl, add);
-        
-            out << endl;
-        }
-
-        for(int r = 0; r < 6; r++) { 
-        out << " ";
-        for(int i =0; i < n; i++) out << (" = ");
+            out << string(lineout_size()+1, ' ') << "|" << lineout(us, i, lvl, add).str() << "|\n";
         }
 
         // ls | fs | rs | bs
-        // for(int i = 0; i ...) {
-        //     int lvl;
-            
+        for(int i = 0; i < 4; i++) out << " " << string(lineout_size(), '-');
+        out << "\n";
+        CRINGEITERATION {
+            for(auto side : ((vector<int>* []){&ls, &fs, &rs, &bs}))
+                out << "|" << lineout(*side, i, lvl, add).str();
+            out << "|\n"; 
+        }
+        for(int i = 0; i < 4; i++) out << " " << string(lineout_size(), '-');
+        out << "\n";
 
-        // } 
+        //    | ds | 
+        CRINGEITERATION {
+            out << string(lineout_size()+1, ' ') << "|" << lineout(ds, i, lvl, add).str() << "|\n";
+        }
+        out << string(lineout_size()+2, ' ') << string(lineout_size(), '-') << "\n";
 
-        // #define PRINT(a, b) out << #a << "(" << b << "):\t" << a.size() << endl;
-        // FORSIDE(PRINT)
         return out;
     }
 
@@ -61,7 +58,8 @@ private:
 FORSIDE(DECLARE)
 
     template <typename Cont>
-    void lineout(ostream& out, const Cont& a, int i, int lvl, int add) const {
+    stringstream  lineout(const Cont& a, int i, int lvl, int add) const {
+        stringstream  out;
         for(int t = 0; t < lvl; t++)  // printf("%4d", 4*(t+1)*(n-t-1)-i+t);
             out << map_color(a[4*(t+1)*(n-t-1)-i+t]);
 
@@ -73,12 +71,17 @@ FORSIDE(DECLARE)
 
         for(int t = lvl; t > 0; t--)  // printf("%4d", -4*t*t+4*n*t-3*n+5*t-2+i);
             out << map_color(a[-4*t*t+4*n*t-3*n+5*t-2+i]);
+        return out;
     }
 
     string map_color(int clr) const {
-        //     colors[] : [ синий, зелёный, красный,  оранжевый,     жёлтый,      белый ]
-        string colors[] = { "104",   "102",   "101", "48;5;208", "48;5;255", "48;5;226" };
-        return string() + "\033[" + (colors[clr]) + "m" + "   " + "\033[0m"; 
+        //     colors[] : [ красный,  оранжевый, зелёный,  синий,     жёлтый,      белый ]
+        string colors[] = {   "101", "48;5;208",   "102",  "104", "48;5;255", "48;5;226" };
+        return string() + "\033[" + (colors[clr]) + "m" + "  " + "\033[0m"; 
+    }
+
+    size_t lineout_size() const {
+        return n*2; // n*map_color(0).size();
     }
 };
 
@@ -142,7 +145,7 @@ INIT_AXIS_MOVE(U, D, us, ds,  ls, 0, bs, 2, rs, 0, fs, 0)
 void P();
 
 int main() {
-    cube x(7);
+    cube x(5);
     x << cout;
     return 0;
 
