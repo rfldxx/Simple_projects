@@ -22,35 +22,7 @@ public:
     // }
 
 
-    ostream& operator << (ostream& out) /* const */ {
-        #define CRINGEITERATION for(int i = 0, lvl = 0, add = 1; i < n; (i == (n+1)/2-1 ? (add = -1, lvl += !(n&1)) : (int)0 ), lvl += add, i++)
-
-        //    | us | 
-        out << string(lineout_size()+2, ' ') << string(lineout_size(), '-') << "\n";
-        CRINGEITERATION {
-            out << string(lineout_size()+1, ' ') << "|" << lineout(us, i, lvl, add).str() << "|\n";
-        }
-
-        // ls | fs | rs | bs
-        for(int i = 0; i < 4; i++) out << " " << string(lineout_size(), '-');
-        out << "\n";
-        CRINGEITERATION {
-            for(auto side : ((vector<int>* []){&ls, &fs, &rs, &bs}))
-                out << "|" << lineout(*side, i, lvl, add).str();
-            out << "|\n"; 
-        }
-        for(int i = 0; i < 4; i++) out << " " << string(lineout_size(), '-');
-        out << "\n";
-
-        //    | ds | 
-        CRINGEITERATION {
-            out << string(lineout_size()+1, ' ') << "|" << lineout(ds, i, lvl, add).str() << "|\n";
-        }
-        out << string(lineout_size()+2, ' ') << string(lineout_size(), '-') << "\n";
-
-        return out;
-    }
-
+    friend ostream& operator << (ostream&, const cube&);
 private:
     const unsigned n;
 
@@ -58,21 +30,7 @@ private:
 FORSIDE(DECLARE)
 
     template <typename Cont>
-    stringstream  lineout(const Cont& a, int i, int lvl, int add) const {
-        stringstream  out;
-        for(int t = 0; t < lvl; t++)  // printf("%4d", 4*(t+1)*(n-t-1)-i+t);
-            out << map_color(a[4*(t+1)*(n-t-1)-i+t]);
-
-        for(int j = 0; j < n-2*lvl; j++) 
-            if( add == +1 )  // printf("%4d", 4*lvl*(n-lvl)   + j);
-                out << map_color(a[4*lvl*(n-lvl)   + j]);
-            else  // printf("%4d", -4*lvl*lvl+4*n*lvl+3*n-6*lvl-3 - j);
-                out << map_color(a[-4*lvl*lvl+4*n*lvl+3*n-6*lvl-3 - j]);
-
-        for(int t = lvl; t > 0; t--)  // printf("%4d", -4*t*t+4*n*t-3*n+5*t-2+i);
-            out << map_color(a[-4*t*t+4*n*t-3*n+5*t-2+i]);
-        return out;
-    }
+    stringstream lineout(const Cont& a, int i, int lvl, int add) const;
 
     string map_color(int clr) const {
         //     colors[] : [ красный,  оранжевый, зелёный,  синий,     жёлтый,      белый ]
@@ -80,15 +38,9 @@ FORSIDE(DECLARE)
         return string() + "\033[" + (colors[clr]) + "m" + "  " + "\033[0m"; 
     }
 
-    size_t lineout_size() const {
-        return n*2; // n*map_color(0).size();
-    }
+    size_t lineout_size() const { return n*2;  /* n*map_color(0).size(); */  }
 };
 
-// попробовать от m[3][3] перейти к vector[3] или array[3]
-//  -> уберает функцию init
-//  -> можно убрать chbs если воспользоваться каким нибудь find_if
-//     для поиска элемента отличного от первого в check()
 
 
 #define inizilization(side, ...) int side[3][3];
@@ -146,7 +98,7 @@ void P();
 
 int main() {
     cube x(5);
-    x << cout;
+    cout << x;
     return 0;
 
 #define filling(side, num) init(side, num);
@@ -159,63 +111,52 @@ FORSIDE(filling)
     // P();
     Fd(); P();
 
-//    spin(fs, ds, 0, ls, 1, us, 2, rs, 3);
-//    spin(bs, ls, 3, ds, 2, rs, 1, us, 0);
-    
-//     int count = 0;
-//     do {
-//         spin(fs, ds, 0, ls, 1, us, 2, rs, 3);
-//         spin(ls, us, 3, fs, 3, ds, 3, bs, 3);
-//         spin(bs, ls, 3, ds, 2, rs, 1, us, 0);
-//         spin(ls, us, 3, fs, 3, ds, 3, bs, 3);
-//         spin(ls, us, 3, fs, 3, ds, 3, bs, 3);
-//         spin(ls, us, 3, fs, 3, ds, 3, bs, 3);
-// //        spin(rs, bs, 1, ds, 1, fs, 1, us, 1);
-//         count++;
-//     } while(check() == 0);
-//     printf("Moves need: %d\n", count);
 }
 
 
+ostream& operator << (ostream& out, const cube& cube) /* const */ {
+    #define CRINGEITERATION for(int i = 0, lvl = 0, add = 1; i < cube.n; (i == (cube.n+1)/2-1 ? (add = -1, lvl += !(cube.n&1)) : (int)0 ), lvl += add, i++)
 
-// печать развертки
-// ----------------------------------------
-void pbs(int m[3][3]) {
-    for(int i = 0; i < 3 ; i++) {
-        printf("        | ");
-        for(int j = 0; j < 3 ; j++)
-            printf("%d ", m[i][j]);
-        printf("|\n");
+    //    | us | 
+    out << string(cube.lineout_size()+2, ' ') << string(cube.lineout_size(), '-') << "\n";
+    CRINGEITERATION {
+        out << string(cube.lineout_size()+1, ' ') << "|" << cube.lineout(cube.us, i, lvl, add).str() << "|\n";
     }
+    for(int i = 0; i < 4; i++) out << " " << string(cube.lineout_size(), '-');
+    out << "\n";
+
+    // ls | fs | rs | bs
+    CRINGEITERATION {
+        for(auto side : ((const vector<int>* []){&cube.ls, &cube.fs, &cube.rs, &cube.bs}))
+            out << "|" << cube.lineout(*side, i, lvl, add).str();
+        out << "|\n"; 
+    }
+
+    //    | ds |
+    for(int i = 0; i < 4; i++) out << " " << string(cube.lineout_size(), '-');
+    out << "\n";
+    CRINGEITERATION {
+        out << string(cube.lineout_size()+1, ' ') << "|" << cube.lineout(cube.ds, i, lvl, add).str() << "|\n";
+    }
+    out << string(cube.lineout_size()+2, ' ') << string(cube.lineout_size(), '-') << "\n";
+
+    return out;
+    #undef CRINGEITERATION
 }
 
-void P() {
-    printf("         -------\n");
-    pbs(us);
-    
-    printf(" ------- ------- -------\n");
-    for(int i = 0; i < 3 ; i++) {
-        printf("| ");
-        
-        for(int j = 0; j < 3 ; j++)
-            printf("%d ", ls[i][j]);
-        
-        printf("| ");
-        
-        for(int j = 0; j < 3 ; j++)
-            printf("%d ", fs[i][j]);
-        
-        printf("| ");
-        
-        for(int j = 0; j < 3 ; j++)
-            printf("%d ", rs[i][j]);
-        
-        printf("|\n");
-    }
-    printf(" ------- ------- -------\n");
-    
-    pbs(ds);
-    printf("         -------\n");
-    pbs(bs);
-    printf("         -------\n\n");
+template <typename Cont>
+stringstream  cube::lineout(const Cont& a, int i, int lvl, int add) const {
+    stringstream  out;
+    for(int t = 0; t < lvl; t++)  // printf("%4d", 4*(t+1)*(n-t-1)-i+t);
+        out << map_color(a[4*(t+1)*(n-t-1)-i+t]);
+
+    for(int j = 0; j < n-2*lvl; j++) 
+        if( add == +1 )  // printf("%4d", 4*lvl*(n-lvl)   + j);
+            out << map_color(a[4*lvl*(n-lvl)   + j]);
+        else  // printf("%4d", -4*lvl*lvl+4*n*lvl+3*n-6*lvl-3 - j);
+            out << map_color(a[-4*lvl*lvl+4*n*lvl+3*n-6*lvl-3 - j]);
+
+    for(int t = lvl; t > 0; t--)  // printf("%4d", -4*t*t+4*n*t-3*n+5*t-2+i);
+        out << map_color(a[-4*t*t+4*n*t-3*n+5*t-2+i]);
+    return out;
 }
