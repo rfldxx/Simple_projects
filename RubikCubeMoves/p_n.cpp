@@ -111,7 +111,7 @@ INIT_AXIS_MOVE(U, D, us, ds,  ls, 0, bs, 2, rs, 0, fs, 0)
 void P();
 
 int main() {
-    cube x(5);
+    cube x(3);
     cout << x;
     return 0;
 
