@@ -18,16 +18,17 @@ public:
     cube(unsigned N) : n(N) FORSIDE(DOTS) {} 
 
     // bool operator !  ()              const { }
-    // bool operator != (const cube& b) const { }
+    // bool operator != (const cube& b) const { 
+        // Если n - нечёт, то проверяем через центры
+        // Иначе находим одинаковые углы и далее ...
+    // }
 
 
     friend ostream& operator << (ostream&, const cube&);
 private:
     const unsigned n;
     enum class CLR {
-           RED,   ORANGE,
-         GREEN,     BLUE,
-        YELLOW,    WHITE
+        RED, ORANGE,   GREEN, BLUE,   YELLOW, WHITE
     };
 
 #define DECLARE(a, ...) vector<CLR> a;
@@ -111,7 +112,7 @@ INIT_AXIS_MOVE(U, D, us, ds,  ls, 0, bs, 2, rs, 0, fs, 0)
 void P();
 
 int main() {
-    cube x(3);
+    cube x(4);
     cout << x;
     return 0;
 
@@ -129,7 +130,7 @@ FORSIDE(filling)
 
 
 ostream& operator << (ostream& out, const cube& _) /* const */ {
-    #define CRINGEITERATION for(int i = 0, lvl = 0, add = 1; i < (int)_.n; (i == (int)(_.n+1)/2-1 ? (add = -1, lvl += !(_.n&1)) : (int)0 ), lvl += add, i++)
+#define CRINGEITERATION for(int i = 0, lvl = 0, add = 1; i < (int)_.n; ++i, (i == (int)(_.n+1)/2 ? (add = -1, lvl += !(_.n&1)) : (int)0 ), lvl += add)
 
     //    | us | 
     out << string(_.lineout_size()+2, ' ') << string(_.lineout_size(), '-') << "\n";
@@ -161,16 +162,12 @@ ostream& operator << (ostream& out, const cube& _) /* const */ {
 template <typename Cont>
 stringstream  cube::lineout(const Cont& a, int i, int lvl, int add) const {
     stringstream  out;
-    for(int t = 0; t < lvl; t++)  // printf("%4d", 4*(t+1)*(n-t-1)-i+t);
-        out << map_color(a[4*(t+1)*(n-t-1)-i+t]);
+    for(int t = 0; t < lvl; t++) out << map_color(a[4*(t+1)*(n-t-1)-i+t]);
 
     for(int j = 0; j < (int)n-2*lvl; j++) 
-        if( add == +1 )  // printf("%4d", 4*lvl*(n-lvl)   + j);
-            out << map_color(a[4*lvl*(n-lvl)   + j]);
-        else  // printf("%4d", -4*lvl*lvl+4*n*lvl+3*n-6*lvl-3 - j);
-            out << map_color(a[-4*lvl*lvl+4*n*lvl+3*n-6*lvl-3 - j]);
+        if( add == +1 )  out << map_color(a[4*lvl*(n-lvl)   + j]);
+        else  out << map_color(a[-4*lvl*lvl+4*n*lvl+3*n-6*lvl-3 - j]);
 
-    for(int t = lvl; t > 0; t--)  // printf("%4d", -4*t*t+4*n*t-3*n+5*t-2+i);
-        out << map_color(a[-4*t*t+4*n*t-3*n+5*t-2+i]);
+    for(int t = lvl; t > 0; t--) out << map_color(a[-4*t*t+4*n*t-3*n+5*t-2+i]);
     return out;
 }
