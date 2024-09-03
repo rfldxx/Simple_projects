@@ -25,10 +25,10 @@ public:
 
 
     friend ostream& operator << (ostream&, const cube&);
-private:
+// private:
     const unsigned n;
     enum class CLR {
-        RED, ORANGE,   GREEN, BLUE,   YELLOW, WHITE
+        RED, ORANGE,   GREEN, BLUE,   WHITE, YELLOW, 
     };
 
 #define DECLARE(a, ...) vector<CLR> a;
@@ -48,11 +48,29 @@ FORSIDE(DECLARE)
     size_t lineout_size() const { return n*2;  /* n*map_color(0).size(); */  }
 
     template <typename Cont>
-    void spin(const Cont* pos[], int l, bool one_side = 0) {
+    void spin( Cont* pos[], int l, bool one_side = 0) {
         for(int i = 0; i < l - one_side; i++)
             cycle_swap( pos[0][i], pos[1][i], pos[2][i], pos[3][i] );
     }
 
+
+    template <typename Cont>
+    void spin_face(Cont& ws) {
+#define unpack(...) __VA_ARGS__
+#define REPEAT_4(a) unpack a  unpack a  unpack a  unpack a
+        for(int l = 0, N = n-1; N > 0; l += N, N -= 2) {
+            l -= N; // чтоб дальше красиво использовать REPEAT_4 (компилятор - вся надежда на тебя, с оптимизируй это)
+            typename Cont::value_type* cringe[] = { REPEAT_4( (&ws[l += N], ) ) 0 };
+            spin( cringe , N );
+        }
+    }
+
+    template <typename Cont>
+    void spin_relaxation(const Cont* pos[4], const int t[4], int h) {
+        
+
+        
+    }
 
 };
 
@@ -113,7 +131,16 @@ void P();
 
 int main() {
     cube x(4);
-    cout << x;
+    x.rs[ 1] = cube::CLR::GREEN;
+    x.rs[ 6] = cube::CLR::RED;
+    x.rs[ 9] = cube::CLR::YELLOW;
+    x.rs[13] = cube::CLR::WHITE;    
+    x.rs[12] = cube::CLR::ORANGE;
+    cout << "INITIAL CUBE:\n" << x;
+    x.spin_face(x.rs);
+    cout << "AFTER MOVING rs:\n" << x;
+    
+
     return 0;
 
 #define filling(side, num) init(side, num);
@@ -129,7 +156,7 @@ FORSIDE(filling)
 }
 
 
-ostream& operator << (ostream& out, const cube& _) /* const */ {
+ostream& operator << (ostream& out, const cube& _) {
 #define CRINGEITERATION for(int i = 0, lvl = 0, add = 1; i < (int)_.n; ++i, (i == (int)(_.n+1)/2 ? (add = -1, lvl += !(_.n&1)) : (int)0 ), lvl += add)
 
     //    | us | 
