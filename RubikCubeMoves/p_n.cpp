@@ -3,10 +3,7 @@
 #include <string>
 #include <sstream>
 
-template<typename T, typename... Args>
-void cycle_swap(T& first, Args&... args) {
-    (std::swap(first, args), ...);
-}
+#include "utils.h"
 
 using namespace std;
 
@@ -48,23 +45,23 @@ FORSIDE(DECLARE)
     size_t lineout_size() const { return n*2;  /* n*map_color(0).size(); */  }
 
     template <typename Cont>
-    void spin( Cont* pos[], int l, bool one_side = 0) {
-        for(int i = 0; i < l - one_side; i++)
+    inline void spin( Cont* pos[], int l) {
+        for(int i = 0; i < l; i++)
             cycle_swap( pos[0][i], pos[1][i], pos[2][i], pos[3][i] );
     }
 
 
+    // поворот одной стороны
     template <typename Cont>
     void spin_face(Cont& ws) {
-#define unpack(...) __VA_ARGS__
-#define REPEAT_4(a) unpack a  unpack a  unpack a  unpack a
-        for(int l = 0, N = n-1; N > 0; l += N, N -= 2) {
-            l -= N; // чтоб дальше красиво использовать REPEAT_4 (компилятор - вся надежда на тебя, с оптимизируй это)
-            typename Cont::value_type* cringe[] = { REPEAT_4( (&ws[l += N], ) ) 0 };
+        for(int l = 0, N = n-1; N > 0; N -= 2) {
+            typename Cont::value_type*  _; // чтоб дальше красиво использовать REPEAT_4
+            typename Cont::value_type* cringe[] = { REPEAT(4)( ( (_ = &ws[l], l += N, _), ) ) 0 };
             spin( cringe , N );
         }
     }
-
+    
+    // поворот примыкающих сторон
     template <typename Cont>
     void spin_relaxation(const Cont* pos[4], const int t[4], int h) {
         
