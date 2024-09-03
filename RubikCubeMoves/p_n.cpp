@@ -14,31 +14,45 @@ using namespace std;
 
 class cube {
 public:
-#define DOTS(a, b) , a(N*N, b)
+#define DOTS(a, b) , a( N*N, CLR(b) )
     cube(unsigned N) : n(N) FORSIDE(DOTS) {} 
 
-    // bool operator ! () const {
-
-    // }
+    // bool operator !  ()              const { }
+    // bool operator != (const cube& b) const { }
 
 
     friend ostream& operator << (ostream&, const cube&);
 private:
     const unsigned n;
+    enum class CLR {
+           RED,   ORANGE,
+         GREEN,     BLUE,
+        YELLOW,    WHITE
+    };
 
-#define DECLARE(a, ...) vector<int> a;
+#define DECLARE(a, ...) vector<CLR> a;
 FORSIDE(DECLARE)
 
     template <typename Cont>
     stringstream lineout(const Cont& a, int i, int lvl, int add) const;
 
-    string map_color(int clr) const {
+    string map_color(CLR _) const {
+        // ((int)CLR::RED);
+        CLR(1);
         //     colors[] : [ красный,  оранжевый, зелёный,  синий,     жёлтый,      белый ]
         string colors[] = {   "101", "48;5;208",   "102",  "104", "48;5;255", "48;5;226" };
-        return string() + "\033[" + (colors[clr]) + "m" + "  " + "\033[0m"; 
+        return string() + "\033[" + (colors[(int)_]) + "m" + "  " + "\033[0m"; 
     }
 
     size_t lineout_size() const { return n*2;  /* n*map_color(0).size(); */  }
+
+    template <typename Cont>
+    void spin(const Cont* pos[], int l, bool one_side = 0) {
+        for(int i = 0; i < l - one_side; i++)
+            cycle_swap( pos[0][i], pos[1][i], pos[2][i], pos[3][i] );
+    }
+
+
 };
 
 
@@ -127,7 +141,7 @@ ostream& operator << (ostream& out, const cube& _) /* const */ {
 
     // ls | fs | rs | bs
     CRINGEITERATION {
-        for(auto side : ((const vector<int>* []){&_.ls, &_.fs, &_.rs, &_.bs}))
+        for(auto side : ((const decltype(_.ls)* []){&_.ls, &_.fs, &_.rs, &_.bs}))
             out << "|" << _.lineout(*side, i, lvl, add).str();
         out << "|\n"; 
     }
