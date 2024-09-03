@@ -14,7 +14,7 @@ using namespace std;
 
 class cube {
 public:
-#define DOTS(a, b) , a( N*N, decltype(a::value_type) (b) )
+#define DOTS(a, b) , a( N*N, (decltype(a)::value_type)(b) )
     cube(unsigned N) : n(N) FORSIDE(DOTS) {} 
 
     // bool operator !  ()              const { }
@@ -37,8 +37,8 @@ FORSIDE(DECLARE)
     stringstream lineout(const Cont& a, int i, int lvl, int add) const;
 
     string map_color(CLR _) const {
+        // decltype(t)::value_type; //::value_type;
         // ((int)CLR::RED);
-        CLR(1);
         //     colors[] : [ красный,  оранжевый, зелёный,  синий,     жёлтый,      белый ]
         string colors[] = {   "101", "48;5;208",   "102",  "104", "48;5;255", "48;5;226" };
         return string() + "\033[" + (colors[(int)_]) + "m" + "  " + "\033[0m"; 
@@ -129,14 +129,14 @@ FORSIDE(filling)
 
 
 ostream& operator << (ostream& out, const cube& _) /* const */ {
-    #define CRINGEITERATION for(int i = 0, lvl = 0, add = 1; i < _.n; (i == (_.n+1)/2-1 ? (add = -1, lvl += !(_.n&1)) : (int)0 ), lvl += add, i++)
+    #define CRINGEITERATION for(int i = 0, lvl = 0, add = 1; i < (int)_.n; (i == (int)(_.n+1)/2-1 ? (add = -1, lvl += !(_.n&1)) : (int)0 ), lvl += add, i++)
 
     //    | us | 
     out << string(_.lineout_size()+2, ' ') << string(_.lineout_size(), '-') << "\n";
     CRINGEITERATION {
         out << string(_.lineout_size()+1, ' ') << "|" << _.lineout(_.us, i, lvl, add).str() << "|\n";
     }
-    for(int i = 0; i < 4; i++) out << " " << string(_.lineout_size(), '-');
+    for(size_t i = 0; i < 4; i++) out << " " << string(_.lineout_size(), '-');
     out << "\n";
 
     // ls | fs | rs | bs
@@ -147,7 +147,7 @@ ostream& operator << (ostream& out, const cube& _) /* const */ {
     }
 
     //    | ds |
-    for(int i = 0; i < 4; i++) out << " " << string(_.lineout_size(), '-');
+    for(size_t i = 0; i < 4; i++) out << " " << string(_.lineout_size(), '-');
     out << "\n";
     CRINGEITERATION {
         out << string(_.lineout_size()+1, ' ') << "|" << _.lineout(_.ds, i, lvl, add).str() << "|\n";
@@ -164,7 +164,7 @@ stringstream  cube::lineout(const Cont& a, int i, int lvl, int add) const {
     for(int t = 0; t < lvl; t++)  // printf("%4d", 4*(t+1)*(n-t-1)-i+t);
         out << map_color(a[4*(t+1)*(n-t-1)-i+t]);
 
-    for(int j = 0; j < n-2*lvl; j++) 
+    for(int j = 0; j < (int)n-2*lvl; j++) 
         if( add == +1 )  // printf("%4d", 4*lvl*(n-lvl)   + j);
             out << map_color(a[4*lvl*(n-lvl)   + j]);
         else  // printf("%4d", -4*lvl*lvl+4*n*lvl+3*n-6*lvl-3 - j);
