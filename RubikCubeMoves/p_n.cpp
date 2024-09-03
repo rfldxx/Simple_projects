@@ -14,7 +14,7 @@ using namespace std;
 
 class cube {
 public:
-#define DOTS(a, b) , a( N*N, decltype(a::value) (b) )
+#define DOTS(a, b) , a( N*N, decltype(a::value_type) (b) )
     cube(unsigned N) : n(N) FORSIDE(DOTS) {} 
 
     // bool operator !  ()              const { }
