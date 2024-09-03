@@ -55,8 +55,8 @@ FORSIDE(DECLARE)
     template <typename Cont>
     void spin_face(Cont& ws) {
         for(int l = 0, N = n-1; N > 0; N -= 2) {
-            typename Cont::value_type*  _; // чтоб дальше красиво использовать REPEAT_4
-            typename Cont::value_type* cringe[] = { REPEAT(4)( ( (_ = &ws[l], l += N, _), ) ) 0 };
+            // typename Cont::value_type*  _; <- чтоб дальше красиво использовать REPEAT_4
+            typename Cont::value_type *_, *cringe[] = { REPEAT(4)( (_ = &ws[l], l += N, _), ) 0 };
             spin( cringe , N );
         }
     }

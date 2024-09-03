@@ -25,9 +25,10 @@ inline void cycle_swap(T& first, Args&... args) {
 
 #define unpack(...) __VA_ARGS__
 
-#define REPEAT_1(a) unpack a
-#define REPEAT_2(a) unpack a REPEAT_1(a)
-#define REPEAT_3(a) unpack a REPEAT_2(a)
-#define REPEAT_4(a) unpack a REPEAT_3(a)
-#define REPEAT_5(a) unpack a REPEAT_4(a)
+#define SAME_R(i) REPEAT_##i(
+#define REPEAT_1(...) __VA_ARGS__
+#define REPEAT_2(...) __VA_ARGS__ SAME_R(1) __VA_ARGS__)
+#define REPEAT_3(...) __VA_ARGS__ SAME_R(2) __VA_ARGS__)
+#define REPEAT_4(...) __VA_ARGS__ SAME_R(3) __VA_ARGS__)
+#define REPEAT_5(...) __VA_ARGS__ SAME_R(4) __VA_ARGS__)
 
