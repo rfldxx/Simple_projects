@@ -1,16 +1,30 @@
 // Вращение сторон "кубика-рубика" NxNxN
 // + отображение его "физической" развёртки
 
+// TODO мб использовать inizial_list чтоб не надо было создавать temp массивы, 
+//      для последующей передачи их в функцию
+
 #include <iostream>
 #include <vector>
 #include <string>
 #include <sstream>
+#include <ostream>
 
 #include "utils.h"
 
 using namespace std;
 
 #define FORSIDE(F) F(fs, 0) F(bs, 1) F(ls, 2) F(rs, 3) F(us, 4) F(ds, 5)
+
+class Qn { };
+// template <typename T>
+// Qn operator << (Qn a, T _) { return a;}
+
+
+template <typename T>
+Qn operator << (Qn a, T _) { return a;}
+Qn operator << (Qn a, ostream& (*manip)(ostream&) ) {return a;};
+
 
 class cube {
 public:
@@ -31,8 +45,8 @@ public:
     //     // Надо наэфективно раставить центры
     // }
 
-
-    friend ostream& operator << (ostream&, const cube&);
+    template<typename Q>
+    friend Q& operator << (Q&, const cube&);
 // private:
     const unsigned n;
     enum class CLR {
@@ -75,37 +89,65 @@ FORSIDE(DECLARE)
         }
     }
     
+    #define cout Qn{}
     // поворот примыкающих сторон
     template <typename Cont>
     void spin_relaxation(Cont* pos[], const int t[], int h) {
+        Cont* zero[] = {pos[0], pos[1], pos[2], pos[3]};
+
         for(int i = 0; i < 4; i++) pos[i] += t[i] * (n-1); 
+        cout << "AFTEr foring NEW's p*:   ";
+        for(int i = 0; i < 4; i++) cout << pos[i]-zero[i] << "  ";
+        cout << endl;
 
         for(int N = n; h >= 0; N -= 2, h--) {
             cout << endl << "START AGAIN!!!" << endl;
             // дебилская t = 3
             for(int i = 0; i < 4; i++) pos[i] += (N-1) - (t[i]==3)*4*(N-1);
+            cout << "AFTEr foring NEW's p*:   ";
+            for(int i = 0; i < 4; i++) cout << pos[i]-zero[i] << "  ";
+            cout << endl;
+
             spin( pos, h+1 );
             cout << "spin 1/3 with h = " << h << endl << *this << endl;
 
-            for(int i = 0; i < 4; i++) pos[i] -= (N-1) - (t[i]==3)*4*(N-1); 
             
 
+            for(int i = 0; i < 4; i++) pos[i] -= (N-1) - (t[i]==3)*4*(N-1); 
+            cout << "AFTEr foring NEW's p*:   ";
+            for(int i = 0; i < 4; i++) cout << pos[i]-zero[i] << "  ";
+            cout << endl;
+            
+            #undef cout
+            cout << N << endl;
+            #define cout Qn{}
+
+            if(N == 1) return; // остался центр 
             spin( pos, N-1 );
             cout << "spin 1/2 with h = " << h << endl << *this << endl;
             cout << endl << "FINISH???" << endl;
 
             for(int i = 0; i < 4; i++) pos[i] += ( !t[i])*4*(N-1) - h;
+            cout << "AFTEr foring NEW's p*:   ";
+            for(int i = 0; i < 4; i++) cout << pos[i]-zero[i] << "  ";
+            cout << endl;
     
             cout << endl << "FINISH?? !" << endl;
 
-            if(h) spin( pos,  h-1 );
+
+            if(!h) return;
+            spin( pos,  h );
     
             cout << endl << "FINISH?!!" << endl;
 
-            for(int i = 0; i < 4; i++) pos[i] += (!!t[i])*4*(N-1) + h;
+            for(int i = 0; i < 4; i++) pos[i] += (!!t[i])*4*(N-1) + h - 2*t[i];
+            cout << "AFTEr foring NEW's p*:   ";
+            for(int i = 0; i < 4; i++) cout << pos[i]-zero[i] << "  ";
+            cout << endl;
             cout << endl << "FINISH!!!" << endl;
         }
     }
+    #undef cout
 
 };
 
@@ -134,14 +176,14 @@ void Bname##d() { spin(INV(SIDE(b)), 0, 2); spin(    __VA_ARGS__ , 2); }
 
 
 int main() {
-    cube x(4);
+    cube x(6);
     x.rs[ 1] = cube::CLR::GREEN;
     x.rs[ 6] = cube::CLR::RED;
     x.rs[ 9] = cube::CLR::YELLOW;
     x.rs[13] = cube::CLR::WHITE;    
     x.rs[12] = cube::CLR::ORANGE;
 
-    // x.us[ 5] = cube::CLR::YELLOW;
+    x.us[9] = cube::CLR::YELLOW;
     cout << "INITIAL CUBE:\n" << x;
     x.spin_face(x.rs);
     cout << "AFTER MOVING rs:\n" << x;
@@ -159,16 +201,40 @@ int main() {
     #define  RTA(...) wRTA(__VA_ARGS__)
     #define wRTA(name, a, ...) decltype(a) name[] = {a, __VA_ARGS__}
 
-    RTA(pp1, stp(x.ds, x.fs, x.us, x.bs));
-    RTA(pp2, 1, 1, 1, 3);
-    x.spin_relaxation(pp1, pp2, 1);
-    cout << "AFTER SPIN BELT rs:\n" << x;
+    {
+        RTA(pp1, stp(x.ds, x.fs, x.us, x.bs));
+        RTA(pp2, 1, 1, 1, 3);
+        x.spin_relaxation(pp1, pp2, 1);
+        cout << "AFTER SPIN BELT rs:\n" << x;
+    }
+
+   {
+        RTA(pp1, stp(x.us, x.rs, x.ds, x.ls));
+        RTA(pp2, 2, 3, 0, 1);
+        x.spin_relaxation(pp1, pp2, 1);
+        cout << "AFTER SPIN BELT fs:\n" << x;
+    }
+
+    {
+        RTA(pp1, stp(x.bs, x.rs, x.fs, x.ls));
+        RTA(pp2, 0, 0, 0, 0);
+        x.spin_relaxation(pp1, pp2, 1);
+        cout << "AFTER SPIN BELT us:\n" << x;
+    }
+
+    {
+        RTA(pp1, stp(x.bs, x.rs, x.fs, x.ls));
+        RTA(pp2, 0, 0, 0, 0);
+        x.spin_relaxation(pp1, pp2, 0);
+        cout << "AFTER SPIN BELT us:\n" << x;
+    }
+
 
     return 0;
 }
 
-
-ostream& operator << (ostream& out, const cube& _) {
+template<typename Q>
+Q& operator << (Q& out, const cube& _) {
 #define CRINGEITERATION for(int i = 0, lvl = 0, add = 1; i < (int)_.n; ++i, (i == (int)(_.n+1)/2 ? (add = -1, lvl += !(_.n&1)) : (int)0 ), lvl += add)
 
     //    | us | 
