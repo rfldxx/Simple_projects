@@ -53,10 +53,7 @@ void extract(array<T, N>& a) {
 
 // int sum() { return 0; }
 
-struct LAST {
-    tmp(size_t N)
-    auto get() { return -1; }
-};
+
 
 tmp(T, V) 
 struct collector {
@@ -82,6 +79,17 @@ struct collector {
 
     tmp(K, L)
     friend ostream& operator << (ostream& out, collector<K, L> cltr);
+};
+
+struct LAST {
+    tmp(size_t N)
+    auto get() { return -1; }
+    
+    tmp(size_t Npos, K)
+    auto push(K a) {
+        if constexpr (Npos == 0) 
+        return collector<K, LAST> {a};
+    }
 };
 
 tmp(T, V)
@@ -120,6 +128,6 @@ int main() {
     auto p = make_collector(-7, 2, 3);
     p.get<1>() *= 2;
     // cout << p.get<1>();
-    auto xp = p.push<2>(9);
+    auto xp = p.push<3>(9);
     cout << xp;
 }
