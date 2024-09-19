@@ -53,43 +53,62 @@ void extract(array<T, N>& a) {
 
 // int sum() { return 0; }
 
+struct LAST {
+    tmp(size_t N)
+    auto get() { return -1; }
+};
+
 tmp(T, V) 
 struct collector {
     T neww;
     V oldd;
 
     tmp(size_t Npos)
-    auto get() {
-        if constexpr (Npos == 0) {
-            return neww;
-        }
+    auto& get() {
+        if constexpr (Npos == 0) return neww;
         else return oldd.template get<Npos-1>();
     }
+
+    tmp(size_t Npos, K)
+    auto push(K a) {
+        if constexpr (Npos == 0) return collector<K, my_type> {a, *this};
+        else {
+            auto tail = oldd.template push<Npos-1>(a);
+            return collector<T, decltype(tail)>{neww, tail};
+        }
+    }
+
+    using my_type = collector<T, V>;
+
+    tmp(K, L)
+    friend ostream& operator << (ostream& out, collector<K, L> cltr);
 };
 
-struct LAST {
-    tmp(size_t N)
-    auto get() { return -1; }
-};
+tmp(T, V)
+ostream& operator << (ostream& out, collector<T, V> cltr) {
+    return out << cltr.neww << " " << cltr.oldd;
+}
+
+tmp(T)
+ostream& operator << (ostream& out, collector<T, LAST> cltr) {
+    return out << cltr.neww << " END!" << endl;
+}
+
+
 
 
 tmp(T)
-collector<T, LAST> f(T a) {
+collector<T, LAST> make_collector(T a) {
     return collector<T, LAST>{a};
 }
 
 tmp(T, x Args) 
-auto f(T a, xAA) {
-    auto tail = f(args...);
+auto make_collector(T a, xAA) {
+    auto tail = make_collector(args...);
     return collector<T, decltype(tail)>{a, tail};
 }
 
 
-tmp(x Args)
-// tuple<Args...>
-auto  sum(Args... args) {
-    return tuple{ (..., args) };
-}
 
 int main() {
     array<int, 4> a{5, -3, 4, 7};
@@ -98,6 +117,9 @@ int main() {
     // auto p = sum(2, 4, 1, 9);
     // cout << get<0>(p) << endl;
     // void a;
-    auto p = f(-7, 2, 3);
-    cout << p.get<1>();
+    auto p = make_collector(-7, 2, 3);
+    p.get<1>() *= 2;
+    // cout << p.get<1>();
+    auto xp = p.push<2>(9);
+    cout << xp;
 }
