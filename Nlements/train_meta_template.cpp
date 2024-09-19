@@ -119,15 +119,17 @@ auto make_collector(T a, xAA) {
 
 
 int main() {
-    array<int, 4> a{5, -3, 4, 7};
+    // array<int, 4> a{5, -3, 4, 7};
     // auto x = extract(a);
     // extract<0>(a);
     // auto p = sum(2, 4, 1, 9);
     // cout << get<0>(p) << endl;
     // void a;
+
+    
     auto p = make_collector(-7, 2, 3);
     p.get<1>() *= 2;
     // cout << p.get<1>();
-    auto xp = p.push<3>(9);
+    auto xp = p.push<3>(9).push<0>(10);
     cout << xp;
 }
