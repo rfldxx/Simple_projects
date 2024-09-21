@@ -68,18 +68,18 @@ struct collector {
     }
 
 
-    // чисто чтобы можно было делать .push_back().push_back().push_back()
-    // в виде fold expression:  ( += ... += args )  [чёт пока мутневатенько]
-    tmp(K)  auto push_back   (K a); 
-    // auto push_back(void a) { return *this; }
-    tmp(K)  auto operator += (K a) { return push_back(a); }
-
-
     // вставка collector в collector
     tmp(size_t Npos, K, L) auto push(collector<K, L> a) {
         return this->push<Npos>(a.neww).template push<Npos+1>(a.oldd);
     }
     tmp(size_t Npos)  auto push(collector<LAST, LAST> a) { return *this; }
+
+
+    // чисто чтобы можно было делать .push_back().push_back().push_back()
+    // в виде fold expression:  ( += ... += args )  [чёт пока мутневатенько]
+    tmp(K)  auto push_back   (K a); 
+    // auto push_back(void a) { return *this; }
+    tmp(K)  auto operator += (K a) { return push_back(a); }
 
 
     tmp(K, L)  friend ostream& operator << (ostream& out, collector<K, L> cltr);
@@ -88,6 +88,7 @@ struct collector {
 
 template<> tmp(K)
 auto collector<LAST, LAST>::push_back(K a) {  return this->push<0>(a); }
+
 tmp(T, V) tmp(K)
 auto collector<T, V>::push_back(K a) {
     return oldd.template push_back(a).template push<0>(neww); 
