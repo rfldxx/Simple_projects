@@ -18,8 +18,8 @@ bool operator < (const array<T1, N>& a, const array<T2, N>& b) {
 // Дальше идет тестирование (для удобства заведём макросы)
 // ---------------------------------------------------------------------------------
 // TEST( $a_1, $a_2, result)
-//   $a_i = (x1, x2, ...)    -> array<decltype(     x1   ),  n> a_i {x1, x2, ...}
-//   $a_i = no_bracket       -> array<decltype(no_bracket),  0> a_i;
+//   $a_i = (x1, x2, ...)    -> array<decltype(     x1     ),  n> a_i {x1, x2, ...}
+//   $a_i = no_bracket       -> array<decltype(no_bracket{}),  0> a_i;
 
 #define unwrap(...) __VA_ARGS__
 #define catch_bracket(...) ~, ~
