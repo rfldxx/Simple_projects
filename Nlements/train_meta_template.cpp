@@ -42,19 +42,6 @@ using namespace std;
 #define tmp(...) template< REP(NARG(__VA_ARGS__), to_typename, __VA_ARGS__) >
 // ----------------------------------------------------------------------------
 
-// tmp(size_t M, T, size_t N)
-// void extract(array<T, N>& a) {
-//     if constexpr (M < N) {
-//         cout << a[M] << endl;
-//         extract<M+1>(a);
-//     }
-//         // return tuple<T>{a[N-1], extract<T, N, M+1>(a)};
-//     else
-//         return;
-// }
-
-// int sum() { return 0; }
-
 
 
 struct LAST { };
@@ -94,49 +81,18 @@ struct collector {
 };
 
 
-// struct LAST {
-//     // tmp(size_t N)
-//     // auto& get() { 
-//     //     static_assert(0, "get behiend the end!");
-//     //     return *this;
-//     // }
-    
-//     // tmp(size_t Npos, K)
-//     // auto push(K a) {
-//     //     static_assert(Npos == 0, "push behiend the end!");
-//     //     return collector<K, LAST> {a};
-//     // }
-
-//     // tmp(size_t Npos, K, L)
-//     // auto push(collector<K, L> a) {
-//     //     static_assert(Npos == 0, "push behiend the end!");
-//     //     return this->push<Npos>(a.neww).template push<Npos+1>(a.oldd);
-//     // }
-// };
-
-// // tmp(T, V)
-// // tmp(size_t Npos)
-// // auto collector<T, V>::push(collector<LAST, LAST> a) { return *this; }
-
-// // tmp(size_t Npos)
-// // auto collector<LAST, LAST>::push(collector<LAST, LAST> a) { return *this; }
-
-
-tmp(T, V)
-ostream& operator << (ostream& out, collector<T, V> cltr) {
-    return out //<< "{"
-               << cltr.neww << " " << cltr.oldd //<< "}"
-               ;
-}
-
 ostream& operator << (ostream& out, collector<LAST, LAST> cltr) {
     return out << " END!" << endl;
 }
 
-
-collector<LAST, LAST> make_collector() {
-    return {};
+tmp(T, V)
+ostream& operator << (ostream& out, collector<T, V> cltr) {
+    return out << cltr.neww << " " << cltr.oldd;
 }
+
+
+
+collector<LAST, LAST> make_collector() { return {}; }
 
 tmp(T, x Args) 
 auto make_collector(T a, xAA) {
@@ -152,12 +108,6 @@ auto array_to_my_collector(array<T, N>& a) {
 }
 
 int main() {
-    // array<int, 4> a{5, -3, 4, 7};
-    // auto x = extract(a);
-    // extract<0>(a);
-    // auto p = sum(2, 4, 1, 9);
-    // cout << get<0>(p) << endl;
-    // void a;
 
     // EXAMPLE 1:
     auto p = make_collector( 1, 4, string{"hi"});
