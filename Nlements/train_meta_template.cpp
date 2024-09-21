@@ -7,6 +7,8 @@
 #include <set>
 #include <iomanip>
 #include <array>
+#include <exception>
+#include <optional>
 #endif
 
 using namespace std;
@@ -40,20 +42,22 @@ using namespace std;
 #define tmp(...) template< REP(NARG(__VA_ARGS__), to_typename, __VA_ARGS__) >
 // ----------------------------------------------------------------------------
 
-tmp(size_t M, T, size_t N)
-void extract(array<T, N>& a) {
-    if constexpr (M < N) {
-        cout << a[M] << endl;
-        extract<M+1>(a);
-    }
-        // return tuple<T>{a[N-1], extract<T, N, M+1>(a)};
-    else
-        return;
-}
+// tmp(size_t M, T, size_t N)
+// void extract(array<T, N>& a) {
+//     if constexpr (M < N) {
+//         cout << a[M] << endl;
+//         extract<M+1>(a);
+//     }
+//         // return tuple<T>{a[N-1], extract<T, N, M+1>(a)};
+//     else
+//         return;
+// }
 
 // int sum() { return 0; }
 
 
+
+struct LAST { };
 
 tmp(T, V) 
 struct collector {
@@ -75,39 +79,63 @@ struct collector {
         }
     }
 
+    tmp(size_t Npos, K, L)
+    auto push(collector<K, L> a) {
+        return this->push<Npos>(a.neww).template push<Npos+1>(a.oldd);
+    }
+
+    tmp(size_t Npos)
+    auto push(collector<LAST, LAST> a) { return *this; }
+
     using my_type = collector<T, V>;
 
     tmp(K, L)
     friend ostream& operator << (ostream& out, collector<K, L> cltr);
 };
 
-struct LAST {
-    tmp(size_t N)
-    auto get() { return -1; }
+
+// struct LAST {
+//     // tmp(size_t N)
+//     // auto& get() { 
+//     //     static_assert(0, "get behiend the end!");
+//     //     return *this;
+//     // }
     
-    tmp(size_t Npos, K)
-    auto push(K a) {
-        if constexpr (Npos == 0) 
-        return collector<K, LAST> {a};
-    }
-};
+//     // tmp(size_t Npos, K)
+//     // auto push(K a) {
+//     //     static_assert(Npos == 0, "push behiend the end!");
+//     //     return collector<K, LAST> {a};
+//     // }
+
+//     // tmp(size_t Npos, K, L)
+//     // auto push(collector<K, L> a) {
+//     //     static_assert(Npos == 0, "push behiend the end!");
+//     //     return this->push<Npos>(a.neww).template push<Npos+1>(a.oldd);
+//     // }
+// };
+
+// // tmp(T, V)
+// // tmp(size_t Npos)
+// // auto collector<T, V>::push(collector<LAST, LAST> a) { return *this; }
+
+// // tmp(size_t Npos)
+// // auto collector<LAST, LAST>::push(collector<LAST, LAST> a) { return *this; }
+
 
 tmp(T, V)
 ostream& operator << (ostream& out, collector<T, V> cltr) {
-    return out << cltr.neww << " " << cltr.oldd;
+    return out //<< "{"
+               << cltr.neww << " " << cltr.oldd //<< "}"
+               ;
 }
 
-tmp(T)
-ostream& operator << (ostream& out, collector<T, LAST> cltr) {
-    return out << cltr.neww << " END!" << endl;
+ostream& operator << (ostream& out, collector<LAST, LAST> cltr) {
+    return out << " END!" << endl;
 }
 
 
-
-
-tmp(T)
-collector<T, LAST> make_collector(T a) {
-    return collector<T, LAST>{a};
+collector<LAST, LAST> make_collector() {
+    return {};
 }
 
 tmp(T, x Args) 
@@ -117,6 +145,11 @@ auto make_collector(T a, xAA) {
 }
 
 
+tmp(T, size_t N, size_t M = 0)
+auto array_to_my_collector(array<T, N>& a) {
+    if constexpr (M == N) return make_collector();
+    else return array_to_my_collector<T, N, M+1>(a).template push<0>(a[M]);
+}
 
 int main() {
     // array<int, 4> a{5, -3, 4, 7};
@@ -126,10 +159,24 @@ int main() {
     // cout << get<0>(p) << endl;
     // void a;
 
-    
-    auto p = make_collector(-7, 2, 3);
+    // EXAMPLE 1:
+    auto p = make_collector( 1, 4, string{"hi"});
     p.get<1>() *= 2;
+    p.get<2>()[0] += 'A'-'a';
     // cout << p.get<1>();
     auto xp = p.push<3>(9).push<0>(10);
     cout << xp;
+
+    // EXAMPLE 2:
+    array<string, 3> t{"hi", "mweow", "sad"};
+    auto q = array_to_my_collector(t);
+    cout << q;
+
+    // EXAMPLE 3:
+    auto r = xp.push<3>(q);
+    cout << r;
+
+    // COMBINE EXAMPLE:
+    array<string, 3> tt{"hi", "mweow", "sad"};
+    cout << make_collector(2.3).push<0>("START").push<1>(array_to_my_collector(tt));
 }
