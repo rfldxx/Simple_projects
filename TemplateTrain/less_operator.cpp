@@ -8,7 +8,7 @@ using namespace std;
 
 template<size_t M = 0, typename T1, typename T2, size_t N>
 bool operator < (const array<T1, N>& a, const array<T2, N>& b) {
-    if constexpr (N <= M) return 0;
+    if constexpr (N == M) return 0;
     else return a[M] != b[M] ? a[M] < b[M] : operator< <M+1, T1, T2, N>(a, b);
 }
 
