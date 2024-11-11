@@ -105,27 +105,36 @@ int main() {
 
     cout << "\n           NORMAL data |  ";
     for(auto [key, val] : data) cout << "{" << key << " : " << val << "}   ";
+// >           NORMAL data |  {0 : 3}   {2 : 7}   {5 : -1}   {11 : 10}
+
 
     cout << "\n          REVERSE data |  ";
     for(auto [key, val] : reverse data) cout << "{" << key << " : " << val << "};   ";
+// >          REVERSE data |  {11 : 10};   {5 : -1};   {2 : 7};   {0 : 3};
+
 
     cout << "\n        ENUMERATE data |  ";
     for(auto [elem,  i] : reverse enumerate reverse  data) {
         auto [key, val] = elem;
         cout << "[" << i << "] {" << key << " : " << val << "}   ";
     }
+// >        ENUMERATE data |  [3] {0 : 3}   [2] {2 : 7}   [1] {5 : -1}   [0] {11 : 10}
+
 
     cout << "\nENUMERATE REVERSE data |  ";
     for(auto [elem,  i] : enumerate reverse data) {
         auto [key, val] = elem;
         cout << "[" << i << "] {" << key << " : " << val << "}   ";
     }
+// >ENUMERATE REVERSE data |  [0] {11 : 10}   [1] {5 : -1}   [2] {2 : 7}   [3] {0 : 3}
+
 
     cout << "\nREVERSE ENUMERATE data |  ";
     for(auto [elem,  i] : reverse enumerate data) {
         auto [key, val] = elem;
         cout << "[" << i << "] {" << key << " : " << val << "}   ";
     }
+// >REVERSE ENUMERATE data |  [3] {11 : 10}   [2] {5 : -1}   [1] {2 : 7}   [0] {0 : 3}
 
     cout << endl;
 }
