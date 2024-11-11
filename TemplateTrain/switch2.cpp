@@ -10,8 +10,8 @@ using namespace std;
 
 
 // === HELP MACRO's ===========================================================
-#define tSAMEFUNC(witch1, witch2, ...) auto witch1() { return data.witch2(); }
-#define  SAMEFUNC(...) tSAMEFUNC(__VA_ARGS__, __VA_ARGS__)
+#define tSAME_FUNC(witch1, witch2, ...) auto witch1() { return data.witch2(); }
+#define  SAME_FUNC(...) tSAME_FUNC(__VA_ARGS__, __VA_ARGS__)
 
 #define SAMEOBVES(name)                 \
 class MyObserver_##name{};              \
@@ -30,7 +30,7 @@ template<typename MyRange>              \
 class name {                            \
     MyRange data;                       \
 public:                                 \
-    SAMEFUNC(size)                      \
+    SAME_FUNC(size)                     \
     name(MyRange  x) : data(x) {}
 
 #define ENDOBVES  };
@@ -47,9 +47,9 @@ public:
     MyRangeInit(Cont& v) : data(v) {}
     auto& val() { return data; }
 
-    SAMEFUNC( begin)   SAMEFUNC( end) 
-    SAMEFUNC(rbegin)   SAMEFUNC(rend)
-    SAMEFUNC(  size)
+    SAME_FUNC( begin)   SAME_FUNC( end) 
+    SAME_FUNC(rbegin)   SAME_FUNC(rend)
+    SAME_FUNC(  size)
 };
 
 template<typename Cont>
@@ -61,8 +61,8 @@ MyRangeInit<Cont> operator <<= (MyObserver observe, Cont& v) { return {v}; }
 // REVERSE
 #define   reverse MyObserver_A1{} <<= MyObserver{} <<=
 SAMEOBVES(A1)
-    SAMEFUNC( begin, rbegin)   SAMEFUNC( end, rend) 
-    SAMEFUNC(rbegin,  begin)   SAMEFUNC(rend,  end)
+    SAME_FUNC( begin, rbegin)   SAME_FUNC( end, rend) 
+    SAME_FUNC(rbegin,  begin)   SAME_FUNC(rend,  end)
 ENDOBVES
 
 
@@ -92,8 +92,8 @@ ENDOBVES
 
 
 
-#undef tSAMEFUNC
-#undef  SAMEFUNC
+#undef tSAME_FUNC
+#undef  SAME_FUNC
 #undef  SAMEOBVES
 #undef   ENDOBVES
 // ============================================================================
@@ -104,36 +104,29 @@ int main() {
     map<int, int> data = { {0, 3}, {2, 7}, {5, -1}, {11, 10}};
 
     cout << "\n           NORMAL data |  ";
-    for(auto [key, val] : data) cout << "{" << key << " : " << ++val << "}   ";
+    for(auto [key, val] : data) cout << "{" << key << " : " << val << "}   ";
 
-    // cout << "\n          REVERSE data |  ";
-    // for(auto  [key, val] : reverse data) cout << "{" << key << " : " << ++val << "};   ";
+    cout << "\n          REVERSE data |  ";
+    for(auto [key, val] : reverse data) cout << "{" << key << " : " << val << "};   ";
 
-    // cout << "\n        ENUMERATE data |  ";
-    // for(auto [elem,  i] : reverse enumerate reverse  data) {
-    //     auto [key, val] = elem;
-    //     cout << "[" << i << "] {" << key << " : " << ++val << "}   ";
-    // }
-
-    // cout << "\nENUMERATE REVERSE data |  ";
-    // for(auto [elem,  i] : enumerate reverse data) {
-    //     auto [key, val] = elem;
-    //     cout << "[" << i << "] {" << key << " : " << val << "}   ";
-    // }
-
-    // cout << "\nREVERSE ENUMERATE data |  ";
-    // for(auto [elem,  i] : reverse enumerate data) {
-    //     auto [key, val] = elem;
-    //     cout << "[" << i << "] {" << key << " : " << val << "}   ";
-    // }
-    // cout << endl;
-
-
-    cout << "\nENUMERATE ENUMERATE |  ";
-    for(auto [elem_i1,  i2] : reverse enumerate  enumerate  data) {
-        auto [elem, i1] = elem_i1;
+    cout << "\n        ENUMERATE data |  ";
+    for(auto [elem,  i] : reverse enumerate reverse  data) {
         auto [key, val] = elem;
-        cout << "[" << i1 << "][" << i2 << "] {" << key << " : " << val << "}   ";
+        cout << "[" << i << "] {" << key << " : " << val << "}   ";
     }
+
+    cout << "\nENUMERATE REVERSE data |  ";
+    for(auto [elem,  i] : enumerate reverse data) {
+        auto [key, val] = elem;
+        cout << "[" << i << "] {" << key << " : " << val << "}   ";
+    }
+
+    cout << "\nREVERSE ENUMERATE data |  ";
+    for(auto [elem,  i] : reverse enumerate data) {
+        auto [key, val] = elem;
+        cout << "[" << i << "] {" << key << " : " << val << "}   ";
+    }
+
+    cout << endl;
 }
    
