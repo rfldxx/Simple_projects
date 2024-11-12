@@ -5,8 +5,18 @@
 
 using namespace std;
 
-// СПАСИБО: https://habr.com/ru/articles/419579/
+// TODO:
+//  * сделать  auto&  operator *  ()  для самопального класса A2::Iterator
+//    (пока что шиза, как детектировать что нужна сслыка, как её возвращать)
+//  * это в свою очередь (возможно) вызовет резню в классе A2 
+//    со всякими auto begin() / auto end() / ...
+// 
+//  * сделать A3 - оператор zip который итерируется по двум контейнерам одновременно:
+//    vector vv1, vv2;
+//    for(auto& [e1, e2] : vv1 zip vv2) e1 = e2;
 
+
+// СПАСИБО: https://habr.com/ru/articles/419579/
 
 
 // === HELP MACRO's ===========================================================
@@ -80,7 +90,11 @@ SAMEOBVES(A2)
 
         bool      operator != (Iterator other) { return p != other.p; }
         Iterator  operator ++ () { Iterator temp = *this; ++p; counter += Adder; return temp; }
-        auto      operator *  () { return pair{*p, counter}; }
+        
+        auto      operator *  () const { return pair{*p, counter}; }
+
+        // ?? pair<DataIterVal&, int&> -> pair<DataIterVal&, int&>&
+        // auto&  operator *  () { /* хрен занет */ return wtf; }
     };
 
     auto  begin() { return Iterator<+1, decltype(data. begin()) >(data. begin()); }
