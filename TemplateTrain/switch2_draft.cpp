@@ -30,8 +30,8 @@ public:
         return A(*p, counter);
     }
 
-    auto  get() const { return counter; }
-    auto& get()       { return counter; }
+    decltype(*Iter{})  get() const { return *p; }
+    decltype(*Iter{})& get()       { return *p; }
 
     void operator ++ () {
         p++;
@@ -49,31 +49,26 @@ int main() {
     B b(vv.begin());
 
     while( b.p != vv.end() ) {
-        cout << b.get() << " -> ";
-        {
+        cout << b.get();
+        
+        { // копирование значения
             auto c = b.get();
             c++;
+            cout << " (" << c << ")";
         }
-        cout << b.get() << " -> ";
-        {
+        cout << "  -> " << b.get();
+
+        { // значение по ссылке
             auto& c = b.get();
             c++;
+            cout << " (" << c << ")";
         }
-        cout << b.get() << "  | ";
+        cout << "  -> " << b.get() << "  | ";
 
-        {
-            auto [e, i] = b.val();
-            e++;
-        }
         
         auto [e, i] = b.val();
-        
-
         cout << i << " " << e << endl;
 
         ++b;
-    }
-
-
-    
+    }    
 }
