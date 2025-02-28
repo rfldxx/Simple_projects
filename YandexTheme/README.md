@@ -8,8 +8,14 @@
   - Бинарный поиск
 
 
+$\text{ }$
+
+
 ## [ЗАДАЧИ с Yandex Intern Week Offer 2024 backend](InternWeekContest/)
 Ссылка на контест: https://contest.yandex.ru/contest/69109/problems
+
+
+$\text{ }$
 
 
 ## [Тренировки по алгоритмам 6.0](Algorithm%20training/)
