@@ -51,3 +51,9 @@ bool can(ll cnt) {
     return acc >= k*cnt;
 }
 ```
+
+$\text{}$
+$\text{}$
+
+
+Топ сайт, для поиска латехных символов: https://detexify.kirelabs.org/classify.html
