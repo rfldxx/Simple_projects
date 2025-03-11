@@ -52,6 +52,27 @@ bool can(ll cnt) {
 }
 ```
 
+---
+
+$\text{}$
+$\text{}$
+
+Иногда полезно рассматривать массив по "Лебегу".
+
+Допустим у нас есть массив `a[i]` - давайте для каждого значения сохраним индексы, при которых достигается это значение.
+```c++
+map<ll, vector<int>> heights;
+heights[0] = {-1};  // <- когда как, возможно и не нужно
+for(ll prev = 0, i = 0; auto e : nums)
+    heights[ prev += e ].push_back(i++);
+```
+Примеры использования: \
+[1124. Longest Well-Performing Interval](https://leetcode.com/problems/longest-well-performing-interval/description/) : [submission](https://leetcode.com/problems/longest-well-performing-interval/submissions/1570442269/) \
+[862. Shortest Subarray with Sum at Least K](https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/description/) : [submission](https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/submissions/1569002067/) \
+(не особо, но чем-то схоже: [1590. Make Sum Divisible by P](https://leetcode.com/problems/make-sum-divisible-by-p/description/) : [submission](https://leetcode.com/problems/make-sum-divisible-by-p/submissions/1568969029/))
+
+---
+
 $\text{}$
 $\text{}$
 
