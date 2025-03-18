@@ -6,7 +6,7 @@ Return the number of substrings containing **at least** one occurrence of all th
 Пусть $A$ - подстроки, в которых содержится символ `'a'`. \
 Аналогично множества $B$, $C$ - для символов `'b'`, `'c'`, соответственно.
 
-Мы можем находить размер множества, подстроки которого состоят **только** из определенных элементов `valid_elem` :
+Мы можем находить кол-во подстрок, состоящих **только** из определенных элементов `valid_elem` :
 ```c++
 int f(set<char> valid_elem) {   // count of substrings with restriction
 	int ans = 0;
