@@ -60,7 +60,7 @@ $\text{}$
 
 [**146. LRU Cache**](https://leetcode.com/problems/lru-cache/description/) \
 todo: \
-\+ можно не просто прямой и "обратной" map-ой решить, \
+\+ можно не просто прямой и "обратной" map-ой решить ([submissions](https://leetcode.com/problems/lru-cache/submissions/1576668167/)), \
 а можно моделировать время последнего взаимодействия через двусвязный список (см. solution)
 
  
