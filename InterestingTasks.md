@@ -69,6 +69,60 @@ todo: \
 $\text{}$
 $\text{}$
 
+
+[**I. Отрезок с нужным подмножеством**](https://codeforces.com/edu/course/2/lesson/9/3/practice/contest/307094/problem/I) \
+Задано число $s$ ($s \le 1000$). Дан массив из $n$ чисел $a_i$ ($n \le 10^5$ , $1 \le a_i \le s$). \
+Скажем, что отрезок этого массива $a[l..r]$ хороший, если на этом отрезке можно выбрать некоторый набор чисел, сумма которых равна $s$. \
+Ваша задача — найти самый короткий хороший отрезок.
+
+Рассмотрим отрезок $a[l..r]$, давайте узнаем какие суммы можно получить, выбрав некоторые числа в нём. \
+Для этого можно воспользоваться DP: пусть $dp[i]$ - кол-во способов выбрать набор чисел (из рассматриваемого отрезка), чтобы сумма чисел набора равнялась $i$.
+```cpp
+long long unsigned dp[1001] = {1}, best = n+1;
+for(int l = 0, r = 0; r < n; r++) {
+    for(int x = a[r], i = s-x; i >= 0; i--)
+	dp[i+x] += dp[i];
+
+    if( !dp[s] ) continue;
+
+    // ищем минимальный отрезок
+    while( dp[s] ) {
+	for(int y = a[l++], i = 0; i <= s-y; i++)  // <- "удаление"
+	    dp[i+y] -= dp[i];                
+    }
+
+    best = min(best, r-l+2);
+}
+```
+Для полноты покажем, что операция "удаление" корректная. Т.е. покажем, что мы можем так проитерироваться не только для последного элемента $x$, которой обновил $dp$, но и для любого прошлого $y$ и при этом полученное состояние будет корректное.
+
+
+
+Другие DP:
+ - [comment](https://codeforces.com/edu/course/2/lesson/9/3/practice?#comment-754998): Hey, my approach for Segment with the Required Subset was: I used the two stacks trick that was in the tutorials. Now we only have to recalculate the subset sum when we add an element. We can store the intermediate DP-table of a subset sum as a bitset of size 1001, where b[i] means that you can reach sum i. Then if you add an element to the set, the bitset gets updated like: b = (b | b<<val). . Last thing left is to check if current segment is good. We have to merge the top bitset of the first and second stack. This can be done with the bitset and-operation. Only then you have to store one of the bitsets backwards, so the elements line up. The runtime will be
+
+ - [comment](https://codeforces.com/edu/course/2/lesson/9/3/practice?#comment-764700): dp[j] is the maximum index of the beginning subsequence whose sum is equal to j.
+```python
+dp = [-1 for i in range(s)]
+ans = int('inf')
+# Iterate the array with the first pointer
+for i in range(0, n, 1):
+    # Update dp array
+    for j in range(s, a[i], -1):
+        dp[j] = max(dp[j], dp[j-a[i]])
+    dp[a[i]] = i
+  
+    if dp[s] != -1:
+	ans = min(ans, i - dp[s] + 1)
+
+print(ans if ans < int('inf') else -1)
+```
+
+---
+
+$\text{}$
+$\text{}$
+
 Иногда полезно рассматривать массив по "Лебегу".
 
 Допустим у нас есть массив `arr[i]` - давайте для каждого значения сохраним индексы, при которых достигается это значение.
