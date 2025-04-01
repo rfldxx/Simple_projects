@@ -75,38 +75,43 @@ $\text{}$
 Скажем, что отрезок этого массива $a[l..r]$ хороший, если на этом отрезке можно выбрать некоторый набор чисел, сумма которых равна $s$. \
 Ваша задача — найти самый короткий хороший отрезок.
 
-Рассмотрим отрезок $a[l..r]$, давайте узнаем какие суммы можно получить, выбрав некоторые числа в нём. \
+**Решение:** Рассмотрим отрезок $a[l..r]$, давайте узнаем какие суммы можно получить, выбрав некоторые числа в нём. \
 Для этого можно воспользоваться DP: пусть $dp[i]$ - кол-во способов выбрать набор чисел (из рассматриваемого отрезка), чтобы сумма чисел набора равнялась $i$.
+
+При добавлении нового элемента $x = a[r+1]$ в каждый набор чисел (из отрезка $a[l..r]$) можно как включить, так и невключить $x$. Итого обновляем состояния $dp$:
 ```cpp
-long long unsigned dp[1001] = {1}, best = n+1;
+for(int i = s-x; i >= 0; i--)  // добавили x
+	dp[i+x] += dp[i];
+
+for(int i = 0; i <= s-x; i++)  // "отемнили" добавление x
+	dp[i+x] -= dp[i]; 
+```
+Для полноты покажем, что не важно в каком порядке "создавать" $dp$ - можно добавлять элементы в любом порядке (а не только в порядке $a[l], a[l+1], ..., a[r], a[r+1]$) 
+
+<img src="InterestingTasks_photo_I_task.png" alt="Покажем, что порядок при построении dp не важен " style="width:550px;"/>
+
+**Итоговый код:**
+```cpp
+long long unsigned dp[1001] = {1};
 for(int l = 0, r = 0; r < n; r++) {
     for(int x = a[r], i = s-x; i >= 0; i--)
 	dp[i+x] += dp[i];
 
-    if( !dp[s] ) continue;
-
-    // ищем минимальный отрезок
     while( dp[s] ) {
+	best = min(best, r-l+1);
 	for(int y = a[l++], i = 0; i <= s-y; i++)  // <- "удаление"
 	    dp[i+y] -= dp[i];                
     }
-
-    best = min(best, r-l+2);
 }
 ```
-Для полноты покажем, что операция "удаление" корректная. Т.е. покажем, что мы можем так проитерироваться не только для последного элемента $x$, которой обновил $dp$, но и для любого прошлого $y$ и при этом полученное состояние будет корректное.
-
-<img src="InterestingTasks_photo_I_task.png" alt="Покажем, что порядок при построении dp не важен " style="width:550px;"/>
-
+Однако это **лажа** и удивительно, что такое решение заходит. Предположим, что в массиве $a$ одни $1$ - тогда состояния $dp$ что-то вроде биномиальных коэффициентов, которые могут принимать значения вплоть до $\text{ } 1000! / 500!^2 \text{ }$ - что явно не влезет в long long unsigned.
 
 Другие DP:
  - [comment](https://codeforces.com/edu/course/2/lesson/9/3/practice?#comment-754998): Hey, my approach for Segment with the Required Subset was: I used the two stacks trick that was in the tutorials. Now we only have to recalculate the subset sum when we add an element. We can store the intermediate DP-table of a subset sum as a bitset of size 1001, where b[i] means that you can reach sum i. Then if you add an element to the set, the bitset gets updated like: b = (b | b<<val). . Last thing left is to check if current segment is good. We have to merge the top bitset of the first and second stack. This can be done with the bitset and-operation. Only then you have to store one of the bitsets backwards, so the elements line up. The runtime will be
 
- - [comment](https://codeforces.com/edu/course/2/lesson/9/3/practice?#comment-764700): dp[j] is the maximum index of the beginning subsequence whose sum is equal to j.
+ - [comment](https://codeforces.com/edu/course/2/lesson/9/3/practice?#comment-764700): `dp[j]` is the maximum index of the beginning subsequence whose sum is equal to `j`.
 ```python
 dp = [-1 for i in range(s)]
-ans = int('inf')
-# Iterate the array with the first pointer
 for i in range(0, n, 1):
     # Update dp array
     for j in range(s, a[i], -1):
@@ -115,8 +120,6 @@ for i in range(0, n, 1):
   
     if dp[s] != -1:
 	ans = min(ans, i - dp[s] + 1)
-
-print(ans if ans < int('inf') else -1)
 ```
 
 ---
