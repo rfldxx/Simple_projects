@@ -149,7 +149,7 @@ $\text{}$
 Допустим у нас есть массив `arr[i]` - давайте для каждого значения сохраним индексы, при которых достигается это значение.
 ```c++
 map<ll, vector<int>> heights;
-heights[0] = {-1};  // <- когда как, возможно и не нужно
+// heights[0] = {-1};  // <- когда как, возможно и не нужно
 for(ll prev = 0, i = 0; auto e : arr)
     heights[ prev += e ].push_back(i++);
 ```
@@ -157,6 +157,49 @@ for(ll prev = 0, i = 0; auto e : arr)
 [1124. Longest Well-Performing Interval](https://leetcode.com/problems/longest-well-performing-interval/description/) : [submission](https://leetcode.com/problems/longest-well-performing-interval/submissions/1570442269/) \
 [862. Shortest Subarray with Sum at Least K](https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/description/) : [submission](https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/submissions/1569002067/) \
 (не особо, но чем-то схоже: [1590. Make Sum Divisible by P](https://leetcode.com/problems/make-sum-divisible-by-p/description/) : [submission](https://leetcode.com/problems/make-sum-divisible-by-p/submissions/1568969029/))
+
+**Задача.** Дан массив $a_i$. Для каждого $i$ найти кол-во $j < i$, таких что $a_j < a_i$. \
+Хочется сразу сделать онлайн решение: будем накапливать значения в `multiset before`, тогда, при получении следующего $a_i$ нужно узнать его (упорядоченную) позицию в multiset-е - это и будет кол-во таких $j$. Оказывается в g++ есть функция order_of_key() - [см.](https://codeforces.com/blog/entry/11080) . \
+Можно, также моделировать (упорядоченную) позицию в `before` и через "массив": для каждого j, мы прибавляем по $+1$ на всем интервале $[a_j, MAX a]$. Делать эффективно такие запросы можно например через дерево отрезков.
+
+Однако, хочется решить такую задачу более прозрачнее. Если достаточно оффлайн решения, то можно поступить так: \
+$\text{1}$. Отсортируем все значения по уровням \
+$\text{2}$. На каждом шаге выгружаем текущий уровень в облако уже рассмотренных точек (в коде `indx`). При этом _находя_ их позиции в этом облаке. 
+А как мы эффективно можем находить позиции без техник выше? Видимо как всегда, рассмотрим метод разделяй и влавствуй. . . В итоге получилось подобие merge-sort ( надеюсь тоже с асимптотикой $O(N \text{ ln} N)$ ):
+
+<details>
+	
+<summary>кринж код</summary>
+	
+```cpp
+vector<int> ans(n, 0);  // ans[i] = размер множества {j : j < i && a[j] < a[i]}
+
+map<int, int> was; // <значение элемента массива, "уровень">
+for(auto e : a) was[e];
+for(int prev = 0; auto& [k, v] : was) v = prev++;
+
+vector<vector<int>> level(was.size());
+for(int i = 0; auto e : a) level[was[e]].push_back(i++);
+
+vector<int> merge(int l, int r) {  // merge-м векторы из интервала [l, r]
+    if( l == r ) return level[l];
+    int m = (l+r)/2;
+
+    vector<int> a = merge(l, m), b = merge(m+1, r), result(a.size() + b.size());
+    int acc_below = 0;  // <- самая важная переменная!
+    for(int i = 0, j = 0, l = 0; l < result.size(); )
+        if( j == b.size() || (i < a.size() && a[i] < b[j]) ) {  // выбераем из массива a
+            acc_below++;
+            result[l++] = a[i++];
+        } else {  // выбераем из массива b
+            ans[b[j]]  += acc_below;
+            result[l++] = b[j++];
+        }
+    return result;
+}
+```
+
+</details>
 
 ---
 
