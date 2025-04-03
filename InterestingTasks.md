@@ -181,7 +181,7 @@ for(int prev = 0; auto& [k, v] : was) v = prev++;
 vector<vector<int>> level(was.size());
 for(int i = 0; auto e : a) level[was[e]].push_back(i++);
 
-vector<int> merge(int l, int r) {  // merge-м векторы из интервала [l, r]
+vector<int> merge(int l, int r) {  // merge-м векторы из отрезка [l, r]
     if( l == r ) return level[l];
     int m = (l+r)/2;
 
@@ -189,7 +189,7 @@ vector<int> merge(int l, int r) {  // merge-м векторы из интерв�
     int acc_below = 0;  // <- самая важная переменная!
     for(int i = 0, j = 0, l = 0; l < result.size(); )
         if( j == b.size() || (i < a.size() && a[i] < b[j]) ) {  // выбераем из массива a
-            acc_below++;
+            acc_below++;  // - это тоже самое что и переменная i
             result[l++] = a[i++];
         } else {  // выбераем из массива b
             ans[b[j]]  += acc_below;
@@ -197,6 +197,8 @@ vector<int> merge(int l, int r) {  // merge-м векторы из интерв�
         }
     return result;
 }
+
+merge(0, was.size()-1);
 ```
 
 </details>
