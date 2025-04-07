@@ -178,7 +178,8 @@ main() {
 <details>
 	
 <summary>ухудшение как минимум до $O(e^N)$</summary>
-	
+
+<img src="expDijkstra.png" alt="пример графа, где Дейкстра будет работать exp" style="width:550px;"/>
 
 </details>
 
