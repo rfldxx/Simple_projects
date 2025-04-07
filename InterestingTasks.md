@@ -138,6 +138,51 @@ $\text{}$
     cout << a;
 ```
 
+---
+
+$\text{}$
+$\text{}$
+
+**Чуть про Дейкстру** \
+"Рекордная" реализация задачи [1383. Дейкстра за O(M log N)](https://acmp.ru/index.asp?main=bstatus&id_t=1383&lang=CPP)
+
+<details>
+	
+<summary>329 символов</summary>
+	
+```cpp
+#include<bits/stdc++.h>
+using namespace std;
+#define t int
+main() {    
+    t n, a, i, j; cin >> n >> i >> a;
+    
+    vector<map<t, t>> e(n);
+    vector d(n, 2009000999);
+    while( cin >> i >> j >> n ) e[i][j] = e[j][i] = n;   
+    
+    for( set q = { pair<t, t>{d[a] = 0, a} }; q.size(); q.erase({n, i}) )
+        for(tie(n, i) = *q.begin(); auto [j, W] : e[i])
+            if( n+W < d[j] )
+                q.erase  ({d[j], j}),
+                q.emplace( d[j] = n+W, j );
+   
+    for(t e : d) cout << " " << e;
+}
+```
+
+</details>
+
+Можно заметить, что если при каждом успешном обновлении дистанции до вершины класть её в " $set$ ", до алгоритм Дейкстры будет корректно отрабатывать и в графе с отрицательными ребрами (главное чтобы не было отрицательных циклов!). Однако сложность может сильно ухудшиться - ведь "итоговое" растояние до вершины может по многу раз обновляться, вызывая при этом каскад обновлений её соседей.
+
+<details>
+	
+<summary>ухудшение как минимум до $O(e^N)$</summary>
+	
+
+</details>
+
+
 
 ---
 
