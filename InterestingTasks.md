@@ -161,7 +161,7 @@ main() {
     set q = { pair{d[j]=0, j} };
              
     map<int, int> e[n];
-    for(; cin >> i >> j >> n; e[i][j] = e[j][i] = n);   
+    while( cin >> i >> j >> n ) e[i][j] = e[j][i] = n;
     
     for(; tie(n, i) = *q.begin(), q.size(); q.erase({n, i}) )
         if( n == d[i] )
