@@ -158,7 +158,7 @@ main() {
     int n, i, j; cin >> n >> j >> j;
 
     vector d(n, 2009000999);
-    set q = { pair{d[j] = 0, j} };
+    set q = { pair{d[j]=0, j} };
              
     map<int, int> e[n];
     for(; cin >> i >> j >> n; e[i][j] = e[j][i] = n);   
