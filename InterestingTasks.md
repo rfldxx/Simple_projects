@@ -148,26 +148,28 @@ $\text{}$
 
 <details>
 	
-<summary>329 символов</summary>
+<summary>305 символов</summary>
 	
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
-#define t int
+
 main() {    
-    t n, a, i, j; cin >> n >> i >> a;
-    
-    vector<map<t, t>> e(n);
+    int n, i, j; cin >> n >> j >> j;
+
     vector d(n, 2009000999);
-    while( cin >> i >> j >> n ) e[i][j] = e[j][i] = n;   
+    set q = { pair{d[j] = 0, j} };
+             
+    map<int, int> e[n];
+    for(; cin >> i >> j >> n; e[i][j] = e[j][i] = n);   
     
-    for( set q = { pair<t, t>{d[a] = 0, a} }; q.size(); q.erase({n, i}) )
-        for(tie(n, i) = *q.begin(); auto [j, W] : e[i])
-            if( n+W < d[j] )
-                q.erase  ({d[j], j}),
-                q.emplace( d[j] = n+W, j );
+    for(; tie(n, i) = *q.begin(), q.size(); q.erase({n, i}) )
+        if( n == d[i] )
+            for(auto [J, W] : e[i])
+                if( n+W < d[J] )
+                    q.emplace( d[J] = n+W, J );
    
-    for(t e : d) cout << " " << e;
+    for(int e : d) cout << " " << e;
 }
 ```
 
