@@ -4,6 +4,8 @@
 // Сделано через макросы, т.к. более красивая версия с использованием
 // tuple для различных polyhash<x, p> оказалась медленее в 4 раза:
 // auto yuki = tuple{ polyhash<257, (int)1e9+7>{}, polyhash<357, (1<<20)>{} };
+// ...
+// bool ok = (get<0>(yuki) ... )
 
 #include<bits/stdc++.h>
 using namespace std;
