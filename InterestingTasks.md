@@ -188,6 +188,31 @@ main() {
 </details>
 
 
+---
+
+$\text{}$
+$\text{}$
+
+**Построение дерева Фенвика за $O(N)$** \
+Спасибо [этому сайту](https://www.baeldung.com/cs/fenwick-tree) за такое гениальное решение:
+
+```python
+algorithm ConstructFenwick(A, n):
+    # INPUT   A       = a number array with size n
+    # OUTPUT  fenwick = the Fenwick array of A
+
+    fenwick <- A
+
+    for i <- 1 to n:
+        parent <- i + RSB(i)
+        if parent <= n:
+            fenwick[parent] <- fenwick[parent] + fenwick[i]
+
+    return fenwick
+```
+В этом блоге, правда, используется не "стандартное" `F(i) = i&(i+1)`, а `F(i) = i - (i&-i) + 1`, в определении "массива" Фенвика:
+
+$$\text{fenwick}[i] := \sum\limits_{k=F(i)}^i a[k]$$
 
 ---
 
