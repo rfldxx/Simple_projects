@@ -194,7 +194,10 @@ $\text{}$
 $\text{}$
 
 **Построение дерева Фенвика за $O(N)$** \
-Спасибо [этому сайту](https://www.baeldung.com/cs/fenwick-tree) за такое гениальное решение:
+Спасибо [этому сайту](https://www.baeldung.com/cs/fenwick-tree) за такое гениальное решение! \
+На рисунке показано какую область покрывает каждая вершина - вершина покрывает всё своё поддерево:
+
+<img src="InterestingTasks_Fenwik_tree.svg" alt="Это дерево!" style="width:550px;"/>
 
 ```python
 algorithm ConstructFenwick(A, n):
