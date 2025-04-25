@@ -227,7 +227,7 @@ main() {
 	
 <summary>ухудшение как минимум до $O(2^N)$</summary>
 
-<img src="expDijkstra.png" alt="пример графа, где Дейкстра будет работать exp" style="width:550px;"/>
+<img src="InterestingTasks_expDijkstra.png" alt="пример графа, где Дейкстра будет работать exp" style="width:550px;"/>
 
 </details>
 
@@ -260,6 +260,79 @@ algorithm ConstructFenwick(A, n):
 В этом блоге, правда, используется не "стандартное" `F(i) = i&(i+1)`, а `F(i) = i - (i&-i) + 1`, в определении "массива" Фенвика:
 
 $$\text{fenwick}[i] := \sum\limits_{k=F(i)}^i a[k]$$
+
+Оказывается дерево Фенвика можно слегка модифицировать и находить **min** на произвольном отрезке **[L, R]**!
+<details>
+	
+<summary>Подробнее</summary>
+
+Как всегда, спасибо 10+ летним постам в интернете: [источник](https://stackoverflow.com/questions/31106459/how-to-adapt-fenwick-tree-to-answer-range-minimum-queries?lq=1). Плюс там была ссылка на [эту статью](https://ioinformatics.org/journal/v9_2015_39_44.pdf).
+
+<img src="InterestingTasks_Fenwik_for_min.jpg" alt="Два встречных дерева Фенвика" style="width:550px;"/>
+
+**Queries** 
+```cpp
+Query(int a, int b) {
+  int val = infinity // always holds the known min value for our range
+
+  // Start traversing the first tree, BIT1, from the beginning of range, a
+  int i = a
+  while (parentOf(i, BIT1) <= b) {
+    val = min(val, BIT2[i]) // Note: traversing BIT1, yet looking up values in BIT2
+    i = parentOf(i, BIT1)
+  }
+
+  // Start traversing the second tree, BIT2, from the end of range, b
+  i = b
+  while (parentOf(i, BIT2) >= a) {
+    val = min(val, BIT1[i]) // Note: traversing BIT2, yet looking up values in BIT1
+    i = parentOf(i, BIT2)
+  }
+
+  val = min(val, REAL[i]) // Explained below
+  return val
+}
+```
+It can be mathematically proven that both traversals will end in the same node. That node is a part of our range, yet it is not a part of any subtrees we have looked at. Imagine a case where the (unique) smallest value of our range is in that special node. If we didn't look it up our algorithm would give incorrect results. This is why we have to do that one lookup into the real values array.
+
+**Updates** \
+Since a node represents the minimum value of itself and its children, changing a node will affect its parents, but not its children. Therefore, to update a tree we start from the node we are modifying and move up all the way to the fictional root node ($0$ or $N+1$ depending on which tree).
+
+Suppose we are updating some node in some tree:
+- `new_value`  $<$  `old_value`, we will always overwrite the value and move up
+- `new_value`  $=$  `old_value`, we can stop since there will be no more changes cascading upwards
+- `new_value`  $>$  `old_value`, things get interesting:
+
+If the `old_value` still exists somewhere within that subtree, we are done \
+If not, we have to find the new minimum value between `real[node]` and each `tree[child_of_node]`, change `tree[node]` and move up \
+Pseudocode for updating node with value $v$ in a tree (note that oldValue is the original value we replaced, whereas v may be reassigned multiple times as we move up the tree):
+```cpp
+while (node <= n+1) {
+  if( v < tree[node] ) {
+    tree[node] = v
+    node = parentOf(node, tree)
+    continue
+  }
+
+  if( v == tree[node] ) break
+
+  if( oldValue > tree[node] ) break
+
+  v = min(v, real[node])
+  for each child {
+    v = min(v, tree[child])
+  }
+
+  tree[node] = v
+  node = parentOf(node, tree)
+}
+```
+Не понятно какая сложность в самом интересном случае? $O(\text{ln}^2 N)$?
+
+</details>
+
+Видимо это что-то подобное встречному дереву Фенвика. Там, если мы увеличиваем элемент $i$, то чтобы корректно поддерживать min на рассматриваемом интервале $\text{fenwick}[k]$, мы можем выполнить два запроса: `get_min(F(k), i-1)` и `get_min(i+1, k)` - сложность $O(\text{ln}^2 N)$.
+
 
 ---
 
