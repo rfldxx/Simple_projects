@@ -207,7 +207,7 @@ algorithm ConstructFenwick(A, n):
     fenwick <- A
 
     for i <- 1 to n:
-        parent <- i + RSB(i)
+        parent <- i + (i&-i)  # для случая F(i) = i - (i&-i) + 1
         if parent <= n:
             fenwick[parent] <- fenwick[parent] + fenwick[i]
 
