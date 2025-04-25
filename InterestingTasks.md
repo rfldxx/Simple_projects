@@ -177,6 +177,50 @@ main() {
 
 Веса рёбер можно брать не только константными $w_{ij}$, а зависящими от минимальной дистанции от начальной до рассматриваемой вершины: $w_{ij} = w_{ij}( \text{ } d[i] \text{ } )$.
 
+<details>
+	
+<summary>Задача Автобусы</summary>
+
+> [134. Автобусы.](https://acmp.ru/asp/do/index.asp?main=task&id_course=2&id_section=32&id_topic=54&id_problem=676) Между некоторыми деревнями края Власюки ходят автобусы. \
+Маршруты представленны в виде: [деревня отправления] [время отправления] [деревня прибытия] [время прибытия]. \
+Марии Ивановне требуется добраться из деревни $A$ в деревню $B$ как можно быстрее (считается, что в момент времени $0$ она находится в деревне $A$).
+```cpp
+#include<bits/stdc++.h>
+using namespace std;
+
+main() {    
+    int i, j, n, m, Start, Final, a, b;
+    cin >> n >> Start >> Final;
+    Start--, Final--;
+    vector d(n, 1e9);
+
+    map<int, map<int, int>> e[n];
+    cin >> m;
+    while( cin >> i >> a >> j >> b ) e[i-1][j-1][a] = b;
+    for(int k = 0; auto& e_i : e)
+        for(auto& [j, mp] : e_i) {
+            int prev = 1e9;
+            for(auto p = mp.rbegin(); p != mp.rend(); p++)
+                prev = p->second = min(p->second, prev);
+        }
+
+    int L_i;  // расстояние до i
+    for( set q = { pair{d[Start] = 0, Start} }; tie(L_i, i) = *q.begin(), q.size(); q.erase({L_i, i}) )
+        if( L_i == d[i] ) {
+            for(const auto& [J, mp] : e[i]) {
+                auto p = mp.lower_bound( L_i );
+                int W  = p != mp.end() ? p->second : 1e9;
+                if( W < d[J] )
+                    q.emplace( d[J] = W, J );
+            }
+        }
+
+    cout << (d[Final] == 1e9 ? -1 : d[Final]);
+}
+```
+
+</details>
+
 Также можно заметить, что если при каждом успешном обновлении дистанции до вершины класть её в " $set$ ", то алгоритм Дейкстры будет корректно отрабатывать и в графе **с отрицательными ребрами** (главное чтобы не было отрицательных циклов!). Однако сложность может сильно **ухудшиться** - ведь "итоговое" растояние до вершины может по многу раз обновляться, вызывая при этом каскад обновлений её соседей.
 
 <details>
