@@ -12,6 +12,7 @@ $\text{ }$
 
 
 ## [ЗАДАЧИ с Yandex Intern Week Offer 2024 backend](InternWeekContest/)
+Ссылка на тренировочный контест: https://contest.yandex.ru/contest/50668/problems \
 Ссылка на контест: https://contest.yandex.ru/contest/69109/problems
 
 
