@@ -2,7 +2,7 @@
 <img src="Безымянный_5.png" alt="certificat.png" style="width:500px;"/>
 
 
-[Заголовок-ссылка](https://yandex.ru/yaintern/training/algorithm-training_march_2024) направляет на сайт "тренировок", там в конце страницы есть таблица.
+Заголовок-ссылка направляет на сайт "тренировок", там в конце страницы есть [таблица](https://yastatic.net/s3/anytask/shmya/Trenirovki_po_algoritmam_5_0_27_01_2025.xlsx).
 
 ## [Тренировки по алгоритмам 6.0](https://yandex.ru/yaintern/training/algorithm-training-october-2024)
 
