@@ -340,6 +340,133 @@ while (node <= n+1) {
 $\text{}$
 $\text{}$
 
+#### [4. Median of Two Sorted Arrays](https://leetcode.com/problems/median-of-two-sorted-arrays/description/)
+Требуется найти медиану двух отсортированных массивов.
+
+Первая мысль была: давайте перебирать индексы $(i, j)$ такие что в итоговом массиве элементы $A[i]$ и $B[j]$ идут подряд. \
+Для фиксированного $i$ такой $j$ можно найти бинарным поиском за $O(\ln M)$. \
+Теперь остается перебирать $i$ ($+$ с учетом крайних случаев, когда $i$ "вышло" за массив $A$) бинарным поиском с целью найти случай когда: $\hspace{3pt}$ $i+j \hspace{2pt} == \hspace{2pt} \frac{n+m}{2}$ . \
+Итого: $O(\ln N \ln M)$
+
+Оказывается есть очень элегантное решение (из вкладки solution): \
+По сути мы "переворачиваем" прошлое решение. \
+Индексу $i$ соответствует $j = \frac{n+m}{2} - i$. \
+Давайте перебирать $i$, пока не окажется что элементы $A[i]$ и $B[j]$ идут подряд! (На языке бин-поиска - последний индекс, такой что $A[i] \le B[j]$). \
+Итого: $O(\ln N)$
+
+---
+
+Из продолжения такого рода детских задачек. [Этот параграф навеян тем как красиво приведено решение для этой задачки на emaxx] \
+Давайте найдем количество всех возможных подмасок всех масок из $N$ элементов (т.е.: $\sum_{mask} \sum_{submask \in mask} 1$ ).
+
+Вполне стандартно находится количество всех множеств - $2^N$. \
+Оказывается можно воспользоваться этой идей и здесь. Для каждого элемента есть три возможных варианта: 
+- **не**принадлежать маске
+- принадлежать маске, но не входить в её подмаску
+- входить в подмаску
+
+$\Rightarrow$ Ответ: $3^N$ 
+
+Такой же ответ будет, если мы рассмотрим количество пар не пересекающихся множеств: $(A, B) : A \cap B = \varnothing$.
+
+Давайте проведем между этими объектами биекцию: \
+Для каждого множества $A$ рассмотрим $\bar A$ $\Leftrightarrow$ множество $B$ по сути является некоторой подмаской множества $\bar A$. ✓
+
+---
+
+$\text{}$
+$\text{}$
+
+
+Дано корневое дерево. Надо оффлайн отвечать на запросы: $(u, k)$ - количество вершин поддерева $u$, отдаленных от $u$ на растоянии не более чем $k$ рёбер.
+
+<details>
+	
+<summary>Вроде есть решение за $O(N + Q)$</summary>
+
+![Пример работы](InterestingTasks_SubtreeQuery.png)
+
+(Если что `accum` - это массив который накапливает количество вершин, посещенных на этой глубине в процессе обхода).
+
+Deepseek предложил название Depth-Buckets / Depth-Counting DFS.
+
+```cpp
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+vector<vector<int>> edges;
+
+vector<int> answer_query;
+// pair: <k, индекс в answer_query>
+vector<vector<pair<int, int>>> vertex_query;
+
+vector<int> accum, prfx;
+int  dfs_h = 0, max_h;
+void dfs(int i, int prev, bool root = 0) {
+    accum[dfs_h]++;
+
+    for(auto [k, q] : vertex_query[i])
+        answer_query[q] -= prfx[dfs_h] - prfx[min(max_h, dfs_h+k)];
+
+    dfs_h++;
+    for(auto j : edges[i])
+        if( j != prev )
+            dfs(j, i);
+    dfs_h--;
+
+    if( !root ) prfx[dfs_h-1] = prfx[dfs_h] + accum[dfs_h];
+    
+    for(auto [k, q] : vertex_query[i])
+        answer_query[q] += prfx[dfs_h] - prfx[min(max_h, dfs_h+k)] + 1;    
+}
+
+
+int main() {
+    int n; cin >> n;
+
+    edges.resize(n);
+    for(int i = 0; i < n-1; i++) {
+        int a, b; cin >> a >> b;
+        // a--, b--;
+        edges[a].push_back(b);
+        edges[b].push_back(a);
+    }
+    
+    vertex_query.resize(n);
+
+    int q; cin >> q;
+    answer_query.resize(q);
+    for(int i = 0; i < q; i++) {
+        int u, k; cin >> u >> k;
+        // u--;
+        vertex_query[u].push_back( {k, i} );
+    }
+
+    max_h = n;
+    accum.resize(max_h);
+    prfx .resize(max_h+1);
+    dfs(0, 0, 1);
+
+    for(int i = 0; i < 4; i++) {
+        cout << "For vertex " << i << ":" << endl;
+        for(auto [k, q] : vertex_query[i]) {
+            cout << k << ": " << answer_query[q] << endl;
+        }
+        cout << endl;
+    }
+}
+```
+
+</details>
+
+
+---
+
+$\text{}$
+$\text{}$
+
 Иногда полезно рассматривать массив по "Лебегу".
 
 Допустим у нас есть массив `arr[i]` - давайте для каждого значения сохраним индексы, при которых достигается это значение.
