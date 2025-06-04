@@ -467,6 +467,104 @@ int main() {
 $\text{}$
 $\text{}$
 
+
+#### [3534. Path Existence Queries in a Graph II](https://leetcode.com/problems/path-existence-queries-in-a-graph-ii/description/)
+По сути задача заключается в следующем: \
+Дано $N$ вершин выстроенных в ряд. \
+Дан массив $a$ показывающий следующее: вершина $i$ *соединена вправо* (неориентированными рёбрами) с $a[i]$ вершинами. Формально $i$ соединена с вершинами: $\{j : j \in [i, a[i]]\}$, а также (т.к. были рёбра от прыдедущих вершин) с вершинами: $\{j : i \in [j, a[j]]\}$. \
+**При этом** область соединения вправо не уменьшается, т.е.: $a[i+1] \ge a[i]-1$.
+
+Требуется отвечать на запросы $(u, v)$ - длинна кратчайшего пути между вершинами $u$ и $v$.
+
+<details>
+<summary> O(1) на онлайн запрос / O(N) препроцессинг </summary>
+
+Спасибо этому [solution](https://leetcode.com/problems/path-existence-queries-in-a-graph-ii/solutions/6691653/o-n-q-sort-online-o-1-query-no-binary-lifting-dfs-only/) за такое красивое дерево!
+
+(Везде считается, что в запросе $u \le v$).
+
+**Intuition & Approach** \
+First, sort the nums and convert the indices.
+
+Then, using sliding window, we can find the furthest previous node connected with the current node (in one step).
+
+**Key insight:** Reversing these pointers, we can form a tree for each group/section of nodes. **The branch/path from a node to the root is exactly the greedy jump path.**
+
+DFS on each tree, keep tracking the path from each node to the root. For queries ending at the current node, bisearch the starting nodes in the path to get the greedy step counts.
+
+<details>
+<summary> 1st Edition Code </summary>
+
+```py3
+class Solution:
+    def pathExistenceQueries(self, n: int, nums: List[int], maxDiff: int, queries: List[List[int]]) -> List[int]:
+
+        # Sort the nums and convert the indices in queries
+        arr = sorted((num, i) for i, num in enumerate(nums))
+        mapping = [-1] * n
+        for j,(_,i) in enumerate(arr):
+            mapping[i] = j
+        queries = [sorted((mapping[u], mapping[v])) for u,v in queries]
+        nums.sort()
+        
+        # Find the furthest step to the left for each node
+        ptr, prv = 0, []
+        for num in nums:
+            while num - nums[ptr] > maxDiff:
+                ptr += 1
+            prv.append(ptr)
+        
+        # Build the trees with the reversing pointers from the previous step
+        conn = [[] for _ in range(n)]
+        for i,p in enumerate(prv):
+            conn[p].append(i)
+        
+        # Collect the queries by their ending nodes
+        qMap = [[] for _ in range(n)]
+        for i,(u,v) in enumerate(queries):
+            qMap[v].append((u,i))
+            
+        # DFS, path maintains the greedy steps from node to root
+        def dfs(node: int):
+            path.append(node)
+            for u,i in qMap[node]:
+                if u >= path[0]:
+                    # Reachable node u, count the steps from v to u in the path
+                    ans[i] = len(path) - bisect_right(path, u)
+            for nxt in conn[node]:
+                if nxt != node:
+                    dfs(nxt)
+            path.pop()
+            
+        ans, path = [-1] * len(queries), []
+        for i in range(n):
+            if not i or nums[i] - nums[i-1] > maxDiff:
+                # Root of a tree, start DFS
+                dfs(i)
+                
+        return ans
+```
+
+</details>
+
+$ $
+
+**O(1) на запрос**
+
+![Again Tree](InterestingTasks_LeetCode3534.png)
+
+При итерировании по массиву вершины дерева по сути встречаются в порядке BFS, и ответ на запрос *(почти) равен* количеству переходов между уровнями на пути от $v$ к $u$. \
+**Однако** иногда надо дополнительно добавлять $+1$, в зависимости от расположения поддеревьев - но можно пронумеровать вершины в специальном порядке (как на рисунке), и определять эту ситуацию простым сравнением: `(subtree_enum[node] > subtree_enum[u])`.
+
+Итого ответ на запрос: `level[v] - level[u] + (subtree_enum[v] > subtree_enum[u]`.
+
+</details>
+
+---
+
+$\text{}$
+$\text{}$
+
 Иногда полезно рассматривать массив по "Лебегу".
 
 Допустим у нас есть массив `arr[i]` - давайте для каждого значения сохраним индексы, при которых достигается это значение.
