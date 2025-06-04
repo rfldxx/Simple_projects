@@ -547,7 +547,7 @@ class Solution:
 
 </details>
 
-$ $
+$\text{}$
 
 **O(1) на запрос**
 
