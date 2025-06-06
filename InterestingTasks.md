@@ -765,7 +765,7 @@ string lastSubstring(string s) {
 
 
 <details>
-<summary> Код O(N) space </summary>
+<summary> Код O(1) space </summary>
 
 ```cpp
 string lastSubstring(string s) {
@@ -785,9 +785,9 @@ string lastSubstring(string s) {
         }
         
         // l - указывет на первый отличающийся символ
-        if( s[best + l] > s[curr + l] ) 
+        if( s[best + l] > s[curr + l] ) {
             curr += l+1;
-        else {
+        } else {
             // обновляем лучший вариант
             best = curr;
             curr = best + l/2 + 1;
