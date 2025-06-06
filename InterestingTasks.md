@@ -764,6 +764,44 @@ string lastSubstring(string s) {
 Эту идею можно доработать и решать за $O(1)$ дополнительной памяти, но что-то кажется и так уже перетрудился с этой задачей.
 
 
+<details>
+<summary> Код O(N) space </summary>
+
+```cpp
+string lastSubstring(string s) {
+    int n = s.size();
+    s.push_back(0);    // Для упрощения while-a в ~8 строчке
+    int best = 0;      // start index of the best substring
+    int curr = 1;      // start index of the current candidate
+    while( curr < n ) {
+        int l = 0;     // length of common prefix
+        while( best + l < curr && s[best + l] == s[curr + l] )
+            l++;
+
+        // наложение кандидатов
+        if( best + l == curr ) {
+            curr += l;
+            continue;
+        }
+        
+        // l - указывет на первый отличающийся символ
+        if( s[best + l] > s[curr + l] ) 
+            curr += l+1;
+        else {
+            // обновляем лучший вариант
+            best = curr;
+            curr = best + l/2 + 1;
+        }
+    }
+    s.pop_back();
+    return s.substr(best);
+}
+
+```
+
+</details>
+
+
 </details>
 
 
