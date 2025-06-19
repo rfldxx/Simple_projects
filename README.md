@@ -1,3 +1,11 @@
+Сейчас, собираю интересное здесь: [InterestingTasks.md](InterestingTasks.md/)
+
+codeforces: [rafaeLL](https://codeforces.com/profile/rafaeLL)
+leetcode: [rfldxx](https://leetcode.com/u/rfldxx)
+
+
+
+
 * **[RedstonePlate](RedstonePlate/)**
 
 TODO: написать класс который позволяет размещать редстоун-схему в одном блоке (поддерживая вложеность)
