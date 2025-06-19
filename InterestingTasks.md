@@ -75,6 +75,12 @@ $\text{}$
 Скажем, что отрезок этого массива $a[l..r]$ хороший, если на этом отрезке можно выбрать некоторый набор чисел, сумма которых равна $s$. \
 Ваша задача — найти самый короткий хороший отрезок.
 
+
+<details>
+	
+<summary> Решения </summary>
+
+
 **Решение:** Рассмотрим отрезок $a[l..r]$, давайте узнаем какие суммы можно получить, выбрав некоторые числа в нём. \
 Для этого можно воспользоваться DP: пусть $dp[i]$ - кол-во способов выбрать набор чисел (из рассматриваемого отрезка), чтобы сумма чисел набора равнялась $i$.
 
@@ -108,7 +114,8 @@ for(int l = 0, r = 0; r < n; r++) {
 
 **Другие DP:**
  - [comment](https://codeforces.com/edu/course/2/lesson/9/3/practice?#comment-754998): Hey, my approach for Segment with the Required Subset was: I used the two stacks trick that was in the tutorials. Now we only have to recalculate the subset sum when we add an element. We can store the intermediate DP-table of a subset sum as a bitset of size $1001$, where $b[i]$ means that you can reach sum $i$. Then if you add an element to the set, the bitset gets updated like: `b = (b | b<<val)` . Last thing left is to check if current segment is good. We have to merge the top bitset of the first and second stack. This can be done with the bitset and-operation. Only then you have to store one of the bitsets backwards, so the elements line up. The runtime will be $O(n \cdot s / \text{wordsize})$. \
-Никак не могу понять?! Как мы "удаляем" самый левый элемент, без полного пересчета отрезка $[l, r]$?
+Никак не могу понять?! Как мы "удаляем" самый левый элемент, без полного пересчета отрезка $[l, r]$? \
+Так-то, спустя день непрерывного размышления только об этом - разобрался, действительно вообще классное решение, надо будет оформить чтоб не забыть. (и чтобы наконец *возможно* подзабыть об этом, а то прям отпечаталась)
 
  - [comment](https://codeforces.com/edu/course/2/lesson/9/3/practice?#comment-764700): `dp[j]` is the maximum index of the beginning subsequence whose sum is equal to `j`.
 ```python
@@ -123,6 +130,8 @@ for i in range(0, n, 1):
 	ans = min(ans, i - dp[s] + 1)
 ```
 
+</details>
+
 ---
 
 $\text{}$
@@ -135,8 +144,58 @@ $\text{}$
     llu a, b; cin >> a >> b;
     while( a != b )
         *(llu*[]){&a, &b}[b > a] >>= 1;
+	// p.s. можно просто:  (b > a ? b : a) >>= 1;
     cout << a;
 ```
+
+
+---
+
+$\text{}$
+$\text{}$
+
+#### [652. Find Duplicate Subtrees](https://leetcode.com/problems/find-duplicate-subtrees/description/)
+Given the root of a binary tree, return all duplicate subtrees. \
+For each kind of duplicate subtrees, you only need to return the root node of any one of them. \
+Two trees are duplicate if they have the same structure with the same node values.
+
+<details>
+	
+<summary> Гениальное кодирование поддеревьев </summary>
+
+(Спасибо [этому решению](https://leetcode.com/problems/find-duplicate-subtrees/solutions/106011/java-concise-postorder-traversal-solution/) )
+
+<img src="InterestingTasks_LeetCode652.jpg" style="width:550px;"/>
+
+И как будто можно не только с бинарными деревьями, но и с "обычными": сперва отсортировать детей и потом полиномиальным хешом по ним.
+
+```cpp
+// В значении(map.second) хранятся: 
+//     <indx этого поддерева, кол-во таких поддеревьев>
+map< tuple<int, int, int>, pair<int, int> > all_sub_tree;
+vector<TreeNode*> answer;
+
+vector<TreeNode*> findDuplicateSubtrees(TreeNode* root) {
+    dfs(root);
+    return answer;
+}
+
+int dfs(TreeNode* root) { // возвращает indx в all_sub_tree
+    if( !root ) return -1;
+
+    auto curr = tuple{root->val, dfs(root->left), dfs(root->right)};
+
+    if( !all_sub_tree.count(curr) ) {
+         all_sub_tree[curr] = {all_sub_tree.size(), 0};
+    }
+
+    auto& [indx, cnt] = all_sub_tree[curr];
+    if( ++cnt == 2 ) answer.push_back(root);
+    return indx;
+}
+```
+
+</details>
 
 ---
 
@@ -339,6 +398,7 @@ while (node <= n+1) {
 
 $\text{}$
 $\text{}$
+
 
 #### [4. Median of Two Sorted Arrays](https://leetcode.com/problems/median-of-two-sorted-arrays/description/)
 Требуется найти медиану двух отсортированных массивов.
