@@ -448,7 +448,7 @@ $\text{}$
 
 (Если что `accum` - это массив который накапливает количество вершин, посещенных на этой глубине в процессе обхода).
 
-Deepseek предложил название Depth-Buckets / Depth-Counting DFS.
+Спросил как можно назвать такой метод - Deepseek предложил очень подходящее название Depth-Buckets / Depth-Counting DFS.
 
 ```cpp
 #include <iostream>
@@ -866,10 +866,75 @@ string lastSubstring(string s) {
 
 
 
+
+
+
+
 ---
 
 $\text{}$
 $\text{}$
+
+
+<details>
+	
+<summary>Чуть-чуть про язык</summary>
+
+жесть копался в старом коде ([RubikCubeMoves](RubikCubeMoves/)) и нашёл имбу:
+```cpp
+// cursed макрос:  RCY([pos][i])  ->  0[pos][i], ...  <->  pos[0][i], ...
+#define RCY(a) 0 a, 1 a, 2 a, 3 a 
+```
+основанную на работе квадратных скобок с указателем: $a[i] \Leftrightarrow  i[a]$
+
+И вот, пришла мысль, почему бы тогда не вызвать:
+```cpp
+RCY( [a[i]] ) 
+    -> 0 [a[i]] , 1 [a[i]] , 2 [a[i]] , 3 [a[i]]
+    ->  a[i][0] ,  a[i][1] ,  a[i][2] ,  a[i][3]
+```
+
+
+А можно ещё (и вообще аниме-компьютер вайб будет):
+```cpp
+#define RCY2(a) 0 [ 0 a,  1 [ 1 a,  2 [ 2 a,  3 [ 3 a 
+
+// хотим a[n][_][m][_]
+RCY2( [a[n]][m] ] )
+=>   a[n][0][m][0] , a[n][1][m][1] , a[n][2][m][2] , a[n][3][m][3]
+```
+
+---
+
+Спасибо интернету, что наткнулся на [C: Stop writing f()](https://nrk.neocities.org/articles/c-stop-writing-old-function-decel). \
+Так можно:
+
+```c
+#include <stdio.h>
+
+void f1(int x) { printf("f1: %d\n", x); }
+void f2(char* s, double t) {
+    printf("f2: %s %lf\n", s, t);
+}
+
+int main() {
+    void (*f) ();
+
+    f = f1;
+    f(5);           // -> f1: 5
+    
+    f = f2;
+    f("miku", 0.2); // -> f2: miku 0.2
+}
+```
+
+</details>
+
+---
+
+$\text{}$
+$\text{}$
+
 
 
 Иногда полезно рассматривать массив по "Лебегу".
