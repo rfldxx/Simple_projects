@@ -930,11 +930,128 @@ int main() {
 
 </details>
 
+
 ---
 
 $\text{}$
 $\text{}$
 
+
+**Задача**: Досадный сбой (...endian). \
+Вы хотите передать $n \le 1000$ беззнаковых $64$-битовых чисел через Интеренет. \
+Однако возникла проблема: из-за "сетевых" интерфейсов при передаче порядок байт числа может смениться на противоположный (условно $a_i = b_1 b_2 .. b_7 b_8 \rightarrow b_8 b_7 ... b_2 b_1 $). Каждое $a_i$ либо остается неизменным, либо так меняется. \
+Ваша задача - передать исходный массив используя не более $1024$ беззнаковых $64$-битовых чисел и востановить его после возможных искажений.
+
+<details>
+	
+<summary> Рабский код </summary>
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+#define llu uint64_t
+
+// Первый различающийся бит, с учётом endian-ходьбы по байтам
+bool reap(bitset<64> a) {
+    for(int blck = 0; blck < 4; blck++) {
+        int di = 8*blck, dj = 64 - 8*(blck+1);
+        for(int t = 0; t < 8; t++)
+            if( a[di + t] != a[dj + t] )
+                return a[di+t]; 
+    }
+    return 0;
+}
+
+void code2() {
+    int n; cin >> n;
+    cout << n + (n+61)/62 << endl;
+
+    bitset<64> chk;
+    chk[0] = 0;
+    chk[64-8] = 1;
+
+    int l = 1;
+    while(n--) {
+        llu a; cin >> a;
+        cout << a << " ";
+
+        if( l == 64-8 ) l++;
+        chk[l++] = reap( bitset<64>(a) );
+
+        if( l == 64 ) {
+            l = 1;
+            cout << chk.to_ullong() << " ";
+        }
+    }
+
+    if( l != 1 )
+        cout << chk.to_ullong() << " ";
+}
+
+
+// меняем порядок байт на противоположный
+llu reorder(llu a) {
+    llu r[8];
+    const llu m = (((llu)1)<<8) - 1;
+    for(int j = 0; j < 8; j++)
+        r[j] = (a >> (8*j)) & m;
+    
+    swap(r[0], r[7]);
+    swap(r[1], r[6]);
+    swap(r[2], r[5]);
+    swap(r[3], r[4]);
+    
+    llu ans = 0;
+    for(int j = 0; j < 8; j++)
+        ans |= (r[j] << (j*8));
+    return ans;
+}
+
+void decode2() {
+    int n; cin >> n;
+    vector<llu> a(n);
+    for(auto&e : a) cin >> e;
+
+    bitset<64> chk;
+    int l = 64;
+    for(int i = -1; i < n-1; i++) {
+        if( l == 64 ) {  // сразу же заходим сюда
+            l = 1;
+            i++;
+
+            int chk_indx = min(n-1, i+62);
+            llu chkk = a[chk_indx];
+            chk = chkk&1 ? reorder(chkk) : chkk;
+        }
+
+        llu x = a[i];
+        
+        if( l == 64-8 ) l++;
+        if( reap(x) != chk[l++] )
+            x = reorder(x);
+
+        cout << x << " ";
+    }
+}
+
+int main() {
+    string s; cin>>s;
+    if( s[0] == 'e' ) code2();
+    else decode2();
+}
+```
+
+</details>
+
+
+
+---
+
+$\text{}$
+$\text{}$
+
+Что идёт дальше, уже и я не читаю... (+ надо бы штуку которая по коммитам создает хронологический порядок)
 
 
 Иногда полезно рассматривать массив по "Лебегу".
