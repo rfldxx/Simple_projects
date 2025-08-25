@@ -1010,14 +1010,11 @@ void code2() {
         if( l == 64-8 ) l++;
         chk[l++] = reap( bitset<64>(a) );
 
-        if( l == 64 ) {
+        if( l == 64 || n == 0 ) {
             l = 1;
             cout << chk.to_ullong() << " ";
         }
     }
-
-    if( l != 1 )
-        cout << chk.to_ullong() << " ";
 }
 
 
