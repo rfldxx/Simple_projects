@@ -1,8 +1,8 @@
 Сейчас собираю интересное здесь: [InterestingTasks.md](InterestingTasks.md/)
 
 codeforces: [rafaeLL](https://codeforces.com/profile/rafaeLL) \
+твинк: [zundamon](https://codeforces.com/profile/zundamon) (пожалуйтста не баньтее ＞﹏＜) \
 leetcode: [rfldxx](https://leetcode.com/u/rfldxx)
-
 
 
 $\text{ }$
