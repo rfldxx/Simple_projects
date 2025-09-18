@@ -1073,6 +1073,55 @@ int main() {
 </details>
 
 
+---
+
+$\text{}$
+$\text{}$
+
+
+<details>
+
+<summary> todo: МОЙ ЛЮБИМЫЙ монотонный стек </summary>
+
+Реализация "адекватного" человека:
+```cpp
+vector<int> lg(n, -1);
+stack <int> qq;  // ~ стек запросов
+for(int i = n-1; i >= 0; i--) {
+	while( !qq.empty() && a[i] > a[qq.top()] ) {
+		lg[qq.top()] = i;
+		qq.pop();
+	}
+	qq.push(i);
+}
+```
+
+Чёт уже бред:
+```cpp
+vector<int> lg(n, -1);
+stack <int> qq;  // ~ стек ответов
+for(int i = 0; i < n; i++){
+	while( !qq.empty() && a[i] > a[qq.top()] )
+		qq.pop();
+	
+	if( !qq.empty() ) lg[i] = qq.top();
+	qq.push(i);
+}
+```
+
+Аниме вайфу аватарка кодефорсе гроссмейстер:
+```cpp
+vector<int> lg(n + 1);
+for (int i = 1; i <= n; i++) {
+    lg[i] = i - 1;
+    while( lg[i] > 0 && a[lg[i]] < a[i] )
+        lg[i] = lg[lg[i]];
+}
+```
+
+</details>
+
+
 
 ---
 
