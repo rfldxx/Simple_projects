@@ -1079,6 +1079,47 @@ int main() {
 $\text{}$
 $\text{}$
 
+
+<details>
+
+<summary> Мосты в графе </summary>
+
+Нашёл такую задачку, где можно проверить код: https://leetcode.com/problems/critical-connections-in-a-network/description/.
+```cpp
+vector<pair<int, int>> answer;  // поиск мостов
+
+vector<vector<int>> edges;
+
+vector<int> path;  // плохое название, это по сути показывает на сколько надо подкоректировать значение, из-за "стрелок снизу"
+vector<int> used;
+
+int dfs(int curr, int prev) {
+    used[curr] = 1;  // вершина на пути dfs
+
+    int influence = 0;
+    for(auto to : edges[curr])
+        if( to != prev && used[to] != 2 ) {
+            path[to]  -=  used[to];
+            influence +=  used[to] ?: dfs(to, curr);  // g++ имба спасибо
+        }
+        
+    used[curr] = 2;  // вершина полностью отработана
+    if( !(influence += path[curr]) ) answer.push_back( {prev, curr} );
+    return influence;
+}
+
+// ВЫЗОВ: (считаем граф связан)
+dfs(0, -1);
+answer.pop_back();  // удаляем {0, -1}
+```
+
+</details>
+
+---
+
+$\text{}$
+$\text{}$
+
 Что идёт дальше, уже и я не читаю... (+ надо бы штуку которая по коммитам создает хронологический порядок)
 
 
