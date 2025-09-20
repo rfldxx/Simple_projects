@@ -1,3 +1,5 @@
+// ПОФИГУ РЕАЛИЗОВАТЬ БЫ ХОТЬ КАК-ТО СНАЧАЛА ЭТОТ ТРЕШАК
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -20,6 +22,8 @@ struct myanimelist {
     int n, free = 1, size = 0;
     vector<  T> data;
     vector<int> prev, next;
+
+    T& operator [] (int i) { return data[i]; }
     
     void push_back(T val) { insert_before(n+1, val); }
     void insert_before(int i, T val) {
@@ -30,8 +34,8 @@ struct myanimelist {
     }
 
     void erase(int i) {
-        prev[next [i]] = prev[i];
-        next[prev [i]] = next[i];
+        prev[next[i]] = prev[i];
+        next[prev[i]] = next[i];
         sync_shift(next[i], free, i);
         size--;
     }
@@ -60,66 +64,63 @@ ostream& operator << (ostream& out, const myanimelist<T> x) {
     }
 }
 
-// struct Lain {
-//     vector<pair<int, int>> ab; // отрезки
-// };
 
-// void meowsh() {  // -> sh+ow+me
-//     // произведём градацию высоты
-//     vector<int> h(N);
-//     for(int i = yorder.start, H = 1; i != yorder.end; i = yorder.next[i], H++) {
-//         h[i] = H;
-//     }
+
+myanimelist<int> xorder(N);
+myanimelist<vector<int>> yorder(N);
+
+void meowsh() {  // -> sh+ow+me
+    // произведём градацию высоты
+    vector<int> h(N+1);
+    for(int i = yorder.next[0], H = 1; i != yorder.n+1; i = yorder.next[i], H++) {
+        h[i] = H;
+    }
     
-//     vector<int> cross;
-//     for(int i = xorder.start i != xorder.end; i = xor.next[i]) {
-//         cross.push_back( h[ xorder.data[i] ] );
-//     }
+    vector<int> cross;
+    for(int i = xorder.next[0]; i != xorder.n+1; i = xorder.next[i]) {
+        cross.push_back( h[ xorder[i] ] );
+    }
 
-//     for(int i = 0; i < cross.size(); i++) {
-//         cout << string(cross[i], 'A'+i) << endl;
-//     }
-// }
+    for(int i = 0; i < cross.size(); i++) {
+        cout << string(cross[i], 'A'+i) << endl;
+    }
+}
 
-// myanimelist<int> xorder(N);
-// myanimelist<vector<int>> yorder(N);
+struct Rect { int x1, y1, x2, y2; };
+
+vector<Rect> history;
+
+struct Section { int x1, x2, y; };
+vector<Section> Lain;
+
+struct Nothing { };
+myanimelist<Nothing> xcords(N);
+
+// n - количество точек для растановки
+// k - количество отсеков
+void test(int n, int k) {
+    vector<int> pos(n);
+    while( 1 ) {
+        {   // печать
+            vector<int> sect(k);
+            for(auto e : pos ) sect[e]++;
+            for(auto e : sect) cout << e << ' ';
+            cout << endl;
+        }
+
+        // обновляем состояние
+        int i = n-1;
+        while( i >= 0 && pos[i] == k-1 ) i--;
+        if( i < 0 ) break;
+        int blck = pos[i]+1;
+        while( i < n ) pos[i++] = blck;
+    }   
+}
+
 
 int main() {
-    // yorder.push_back({})
-    // xorder.push_back()
+    test(3, 4);
 
 
-    myanimelist<int> x(3);
 
-    cout << x;
-
-    x.push_back(1);
-    cout << x;
-    x.push_back(2);
-    cout << x;
-    x.push_back(3);
-    cout << x;
-
-    x.erase(2);
-    cout << x;
-    x.erase(1);
-    cout << x;
-    x.erase(3);
-    cout << x;
-
-    cout << "///////////////////////////////\n";
-
-    x.push_back(5);
-    cout << x;
-    x.push_back(4);
-    cout << x;
-    x.push_back(6);
-    cout << x;
-
-    x.erase(3);
-    cout << x;
-    x.erase(1);
-    cout << x;
-    x.erase(2);
-    cout << x;
 }
