@@ -3,7 +3,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-const int N = 5;
 
 template<typename T>
 void sync_shift(T) {}
@@ -13,7 +12,6 @@ void sync_shift(T& a, T& b, Args&&... args) {
     a = b;
     sync_shift(b, args...);
 }
-
 
 // Боль . . .
 // лол, реализовываю связный список в 4ый раз
@@ -66,61 +64,138 @@ ostream& operator << (ostream& out, const myanimelist<T> x) {
 
 
 
-myanimelist<int> xorder(N);
-myanimelist<vector<int>> yorder(N);
+const int N = 5;
 
-void meowsh() {  // -> sh+ow+me
-    // произведём градацию высоты
-    vector<int> h(N+1);
-    for(int i = yorder.next[0], H = 1; i != yorder.n+1; i = yorder.next[i], H++) {
-        h[i] = H;
-    }
-    
-    vector<int> cross;
-    for(int i = xorder.next[0]; i != xorder.n+1; i = xorder.next[i]) {
-        cross.push_back( h[ xorder[i] ] );
-    }
+struct Section {
+    int x1, x2, y;
+    vector<int> subs;  // точки внутри
+    // => количество отсеков = 2*subs.size()+1
+};
 
-    for(int i = 0; i < cross.size(); i++) {
-        cout << string(cross[i], 'A'+i) << endl;
-    }
-}
-
-struct Rect { int x1, y1, x2, y2; };
-
-vector<Rect> history;
-
-struct Section { int x1, x2, y; };
-vector<Section> Lain;
+vector<Section> lain;
 
 struct Nothing { };
-myanimelist<Nothing> xcords(N);
+myanimelist<Nothing> xcords(N), ycords(N);
+myanimelist<Nothing> possibly(N); // допустимые для выбора y
 
-// n - количество точек для растановки
-// k - количество отсеков
-void test(int n, int k) {
-    vector<int> pos(n);
+
+
+struct Rect { int x1, y1, x2, y2; };
+vector<Rect> history;
+
+// печать всех прямоугольников
+void Miku(const vector<Rect> history) {
+    int n = 0, m = 0;
+    vector<int> xx(N), yy(N);
+    for(int i = 0, I = 0; 1; i = xcords.next[i]) {
+        xx[i] = I++;
+        m++;
+        if( i == xcords.n+1 ) break;
+    }
+    for(int i = 0, I = 0; 1; i = ycords.next[i]) {
+        yy[i] = I++;
+        n++;
+        if( i == ycords.n+1 ) break;
+    }
+    
+    vector field(n, vector<int>(m));
+    for(int id = 0; auto [xx1, yy1, xx2, yy2] : history) {
+        int x1 = xx[xx1], x2 = xx[xx2];
+        int y1 = yy[yy1], y2 = yy[yy2];
+        for(int i = y1; i <= y2; i++)
+            for(int j = x1; j <= x2; j++)
+                field[i][j] = id;
+
+        id++;
+    }
+    for(auto& vv : field) {
+        for(auto e : vv) cout << ((char)('A'+e));
+        cout << endl;
+    }
+    cout << endl;    
+}
+
+
+void test2(int n, int k) {
+    vector<int> pos(k);
+    pos[0] = n;
     while( 1 ) {
         {   // печать
-            vector<int> sect(k);
-            for(auto e : pos ) sect[e]++;
-            for(auto e : sect) cout << e << ' ';
+            for(auto e : pos) cout << e << ' ';
             cout << endl;
         }
 
         // обновляем состояние
-        int i = n-1;
-        while( i >= 0 && pos[i] == k-1 ) i--;
-        if( i < 0 ) break;
-        int blck = pos[i]+1;
-        while( i < n ) pos[i++] = blck;
+        if( pos[k-1] == n ) break;
+
+        int i = k-2;
+        while( pos[i] == 0 ) i--;
+        int x = pos[k-1];
+        pos[k-1]  = 0;
+        pos[i]   -= 1;
+        pos[i+1] += 1 + x;
     }   
+}
+
+// s - количество внутрених точек на сегменте
+// => 2*s + 1 отсек
+bool test3(int n, int s) {
+    int cnt = 0;
+    int k = 2*s+1;
+    vector<int> pos(k);
+    pos[0] = n;
+    while( 1 ) {
+        {   // печать
+            // for(auto e : pos) cout << e << ' ';
+            // cout << endl;
+            cnt++;
+        }
+
+        // обновляем состояние
+        int x = pos[k-1];
+        pos[k-1] = 0;
+        if( x == n ) break;        
+        
+        int i = k-2;
+        while( pos[i] == 0 ) i--;
+        pos[i]   -= 1;
+        pos[i+1] += 1;
+        if( (i+1)&1 ) pos[i+2] += x;
+        else          pos[i+1] += x;
+    }
+
+    // должно быть sum_{t=0}^{min(s, n)} (n+s-t)! / (n-t)! / (s-t)! / t!
+    int need = 0;
+    int A = min(n,s), B = max(n, s);
+    long long mlt = 1;
+    for(int x = A; x > 0; x--) 
+        mlt = (mlt*(B+x)) / x; 
+    
+    for(int t = 0; t <= A; t++) {
+        need +=  mlt;
+        mlt   = (mlt * (A-t) * (B-t)) / (A+B - t) / (t+1);
+    }
+    // cout << cnt << endl;
+    // cout << need << endl;
+    return need == cnt;
 }
 
 
 int main() {
-    test(3, 4);
+    bool ok = 1;
+    for(int n = 1; n <= 10; n++)
+    for(int s = 1; s <= 10; s++)
+        ok &= test3(2, 2);
+    cout << ok << endl;
+    // lain.push_back( {0, N, 0} );
 
+    // {   // получили сегмент
+    //     Section yoko;
+    //     auto [x1, x2, y, subs] = yoko;
 
+    //     int k = 2*subs.size()+1; // количество отсеков
+        
+
+    // }
 
 }
