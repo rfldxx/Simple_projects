@@ -58,6 +58,6 @@ Inspired by: https://leetcode.com/problems/find-the-minimum-area-to-cover-all-on
 Обновили на днях: https://oeis.org/A340984
 https://math.stackexchange.com/questions/4008337/how-many-prime-rectangle-tilings-are-there
 
-![alt text](image.png)
+![alt text](image3.png)
 
 </details>
