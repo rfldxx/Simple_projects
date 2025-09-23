@@ -55,7 +55,7 @@ Inspired by: https://leetcode.com/problems/find-the-minimum-area-to-cover-all-on
 
 <summary> ШОК </summary>
 
-Обновили на днях: https://oeis.org/A340984
+Обновили на днях: https://oeis.org/A340984 \
 https://math.stackexchange.com/questions/4008337/how-many-prime-rectangle-tilings-are-there
 
 ![alt text](image3.png)
