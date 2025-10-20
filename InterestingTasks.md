@@ -1169,6 +1169,169 @@ answer.pop_back();  // удаляем {0, -1}
 $\text{}$
 $\text{}$
 
+
+<details>
+
+<summary> Алгоритм Дейсктры для перевода в постфиксную нотацию  </summary>
+
+Забавно, что можно ввести сравнение приоритетов не только между операторами, но и между переменными и скобками. \
+В этом случае наверное не получится каждому токену дать абсолютное значение приоритета, но можно написать "компаратор" (который может быть: cmp(a, b) $\neq$ cmp(b, a)) и может быть можно подкрутить даже какие-то диаграммы Хассе. \
+В итоге  "ядро" алгоритма становиться размером всего в $5$ строчек!
+
+Ну и еще прикол, баян наверное, что этому алгоритму (сортировочной станции) можно скормить уже польскую нотацию и он её переварит (правда результат может стать не корректным, например `a b c d + * -` $\rightarrow$ `a b c d * + -`).
+
+В коде дополнительно окружил всё выражение скобками, чтобы не надо было в конце очищать стек.
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+bool extract_op(char wait, char neww) {
+    if( 'a' <= wait && wait <= 'z' ) return 1;
+    if( 'a' <= neww && neww <= 'z' ) return 0;
+    if( neww == '(' || ( wait == '^' && neww == '^') ) return 0;
+
+    map<char, int> priory{ {'(', -2}, {')', -1}, {'+', 0}, {'-', 0}, {'*', 1}, {'/', 1}, {'^', 2} };
+    return priory.at(wait) >= priory.at(neww);
+}
+
+int main() {
+    string s; cin >> s;
+    stack<char> buffer;
+    buffer.push('(');
+    s += ')';
+
+    for(auto e : s) {
+        for(char t; extract_op(t = buffer.top(), e); ) {
+            buffer.pop();
+            cout << t << " ";
+        }
+
+        if( e == ')' ) buffer.pop();
+        else           buffer.push(e);
+    }
+}
+```
+
+<details>
+
+<summary> Откудова  </summary>
+
+Подобно тому как приходилось несколько раз писать свой vector, связный список, видеть очередной "вывод" уравнения Эйлера — Лагранжа, случилось опять написать алгоритм Дейкстры для парсинга.
+
+![hololive omaru polka](InterestingTasks_Omaru_Polka.jpg)
+
+Задача из тренировок по алгоритмам 8.0 (https://contest.yandex.ru/contest/80941/problems/I/): \
+В общем есть операции: +, -, *, /, ^ (возведение в степень правоассоциативно, остальное как обычно левоассоциативно). \
+Переменные: 'a' - 'z'. \
+Есть скобки. \
+На вход дается корректное арифметическое выражение без пробелов. Требуется вывести дерево разбора:
+```
+IN :  (a+b+c)*(d-a)
+OUT:
+         .----[*]----.   
+         |           |   
+   .----[+]-.     .-[-]-.
+   |        |     |     |
+.-[+]-.     c     d     a
+|     |                  
+a     b                  
+
+```
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+bool stop_op(char curr, char neww) {
+    const map<char, int> priory = { {'(', -2}, {')', -1}, {'+', 0}, {'-', 0}, {'*', 1}, {'/', 1}, {'^', 2} };
+    if( neww == '(' || (curr == '^' && neww == '^') ) return 1;
+    return priory.at(curr) < priory.at(neww);
+}
+
+vector<tuple<char, int, int>> tree;
+
+stack< int> buffer_var;
+stack<char> buffer_op ;
+
+void new_vertex(char e, int i = -1, int j = -1) {
+    buffer_var.push( tree.size() );
+    tree .push_back( {e,  i,  j} );
+}
+
+vector<vector< pair<int, char> >> layers;  // pair: <absolute_pos, symbol>
+
+int dfs2(int curr, int space, int h) {  // возвращает правую границу отрисованного дерева
+    auto [obj, i, j] = tree[curr];
+    if( i == -1 ) {  // переменная
+        layers[h].push_back( {space, obj} );
+        return space+1;
+    }
+
+    space = dfs2(i, space, h+1);
+    layers[h].push_back( {space+2, obj} );
+    return dfs2(j, space+5, h+1);
+}
+
+int main() {
+    string s; cin >> s;
+    buffer_op.push('(');
+    s += ')';
+    
+    for(auto e : s) {
+        if( 'a' <= e && e <= 'z' ) { new_vertex(e); continue; }
+
+        char t;
+        while( !stop_op(t = buffer_op.top(), e) ) {
+            buffer_op.pop();
+
+            int j = buffer_var.top();  buffer_var.pop();
+        	int i = buffer_var.top();  buffer_var.pop();
+            new_vertex(t, i, j);
+        }
+
+        if( e == ')' ) buffer_op.pop();
+        else           buffer_op.push(e);
+    }    
+
+    int n = tree.size();
+    layers.resize(n+1);
+    dfs2(buffer_var.top(), 0, 0);
+
+    for(int h = 0; !layers[h].empty(); h++) {
+    	vector<int> dots = {-1};  // чтоб упростить if
+        for(int prev = 0, i = 0; auto [pos, e] : layers[h]) {
+            if( 'a' <= e && e <= 'z' ) {
+                cout << string(pos - prev, ' ');
+                prev = pos+1;
+                cout << e; continue; 
+            }
+
+            int l = layers[h+1][i++].first;  dots.push_back(l);
+            int r = layers[h+1][i++].first;  dots.push_back(r);
+            cout << string(l - prev, ' ') << "." << string((pos-1) - (l+1), '-');
+            cout << "[" << e << "]" << string(r - (pos+2), '-') << ".";
+            prev = r+1;
+        }
+        cout << endl;
+        for(int i = 1; i < dots.size(); i++)
+            cout << string(dots[i] - (dots[i-1]+1), ' ') << "|";
+        cout << endl;
+    }
+} 
+```
+
+</details>
+
+
+</details>
+
+
+---
+
+$\text{}$
+$\text{}$
+
 Что идёт дальше, уже и я не читаю... (+ надо бы штуку которая по коммитам создает хронологический порядок)
 
 
