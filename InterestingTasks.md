@@ -1358,8 +1358,8 @@ int lengthOfLIS(vector<int>& nums) {
 
 $\text{ }$
 
-[Коммент с codeforce](https://codeforces.com/blog/entry/147869?#comment-1322131) к по сути НВП с "весами" (вообще я когда-то видел подобную идею на leetcode, но не смог отыскать, вот только [submissions](https://leetcode.com/problems/longest-increasing-subsequence/submissions/1664258421) остался). \
-Здесь мы по сути выворачиваем динамику: $dp[a]$ - максимальная длинна $l$ возрастающей последовательности оканчивающейся на $a$.
+[Коммент с codeforces](https://codeforces.com/blog/entry/147869?#comment-1322131) к по сути НВП с "весами" (вообще я когда-то видел подобную идею на leetcode, но не смог отыскать, вот только [submissions](https://leetcode.com/problems/longest-increasing-subsequence/submissions/1664258421) остался). \
+Здесь мы по сути выворачиваем динамику: $dp[a]$ - равно максимальной длинне $l$ возрастающей последовательности оканчивающейся на $a$.
 
 ```cpp
 int lengthOfLIS(vector<int>& nums) {
