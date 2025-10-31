@@ -1332,6 +1332,62 @@ int main() {
 $\text{}$
 $\text{}$
 
+
+
+<details>
+
+<summary> Треш dp НВП  </summary>
+
+Наибольшая возрастающая подпоследовательность. Задача с leetcode: [300. Longest Increasing Subsequence](https://leetcode.com/problems/longest-increasing-subsequence/description).
+
+Обычная теория: [emaxx](http://e-maxx.ru/algo/longest_increasing_subseq_log#7) (либо если не грузиться [neerc](https://neerc.ifmo.ru/wiki/index.php?title=Задача_о_наибольшей_возрастающей_подпоследовательности)). \
+Тут: $dp[l]$ - равно минимальному числу $a$ на которое оканчивается возрастающая последовательность длинны $l$.
+
+```cpp
+int lengthOfLIS(vector<int>& nums) {
+    int n = nums.size();
+    vector<int> dp(n+1, +2e9);
+    dp[0] = -2e9;
+
+    for(auto e : nums)
+        *lower_bound(alls(dp), e) = e;
+
+    while( dp[n] == +2e9 ) n--;
+    return n;
+}
+```
+
+$\text{ }$
+
+[Коммент с codeforce](https://codeforces.com/blog/entry/147869?#comment-1322131) к по сути НВП с "весами" (вообще я когда-то видел подобную идею на leetcode, но не смог отыскать, вот только [submissions](https://leetcode.com/problems/longest-increasing-subsequence/submissions/1664258421) остался). \
+Здесь мы по сути выворачиваем динамику: $dp[a]$ - максимальная длинна $l$ возрастающей последовательности оканчивающейся на $a$.
+
+```cpp
+int lengthOfLIS(vector<int>& nums) {
+    map<int, int> dp = { {-2e9, 0} };
+
+    for(auto e : nums) {
+        if( dp.count(e) ) continue;
+
+        auto p = dp.upper_bound(e);
+        dp[e]  = prev(p)->second + 1;
+
+        if( p != dp.end() ) dp.erase(p);
+    }
+
+    return dp.rbegin()->second;  // == was.size()-1
+}
+```
+
+</details>
+
+
+
+---
+
+$\text{}$
+$\text{}$
+
 Что идёт дальше, уже и я не читаю... (+ надо бы штуку которая по коммитам создает хронологический порядок)
 
 
