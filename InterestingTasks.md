@@ -1187,8 +1187,7 @@ $\text{}$
 using namespace std;
 
 bool extract_op(char wait, char neww) {
-    if( 'a' <= wait && wait <= 'z' ) return 1;
-    if( 'a' <= neww && neww <= 'z' ) return 0;
+    if( isalpha(wait) || isalpha(neww) ) return isalpha(wait);
     if( neww == '(' || ( wait == '^' && neww == '^') ) return 0;
 
     map<char, int> priory{ {'(', -2}, {')', -1}, {'+', 0}, {'-', 0}, {'*', 1}, {'/', 1}, {'^', 2} };
@@ -1202,13 +1201,13 @@ int main() {
     s += ')';
 
     for(auto e : s) {
-        for(char t; extract_op(t = buffer.top(), e); ) {
-            buffer.pop();
+        for( char t;  extract_op(t = buffer.top(), e);  buffer.pop() )
             cout << t << " ";
-        }
 
-        if( e == ')' ) buffer.pop();
-        else           buffer.push(e);
+        if( e == ')' )   buffer.pop();
+        else             buffer.push(e);
+		// эхх, вот бы:  buffer. ( e == ')' ? pop() : push(e) );
+		// или чтоб точка была перед "функцией": ( cond ? .f() : .g() )
     }
 }
 ```
