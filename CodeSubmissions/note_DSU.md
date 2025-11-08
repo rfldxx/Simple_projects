@@ -315,3 +315,88 @@ int main() {
 </details>
 
 
+$\text{ }$
+
+
+#### 2D. Начальники 
+
+Необходимо обрабатывать два вида запросов:
+* начальник $a$ становится подчиненным начальника $b$
+* дан сотрудник $c$, какое количество связей подчинения надо пройти наверх до начальника? (если $c$ — начальник, то ответ $0$)
+
+
+<details>
+
+<summary> Решение </summary>
+
+Как и в задаче "Подсчет опыта" аккуратно навешиваем на поддеревья: $+ val$. \
+Вообще как приятно это делать!!! =w= \
+Получаем честное DSU со всеми эвристиками.
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+// Решение как и в 1C. Подсчет опыта. (тоже ищем сумму на пути до корня)
+// Асимптотика: O(N alpha(N))
+
+// через дерево
+int pprev[300001];
+int    sz[300001];
+int delta[300001];
+
+
+int get(int a) {  // без изменений по сравнению с "Подсчет опыта"
+    if( pprev[a] == a ) return a;  // корень
+    
+    int root = get(pprev[a]);      // обновили delta[pprev[a]]
+
+    if( pprev[a] != root )
+        delta[a] += delta[pprev[a]];
+    
+    return pprev[a] = root;
+}
+
+void unite(int id1, int id2) {  // подцепляем id2 к id1
+    if( sz[id1] >= sz[id2] ) {
+        delta[id2] += -delta[id1] + 1;
+    }
+    else {
+        delta[id2] += 1;
+        delta[id1] -= delta[id2];
+
+        swap(id1, id2);
+    }
+
+    sz   [id1] += sz[id2];
+    pprev[id2]  = id1;
+}
+
+int main() {
+    ios::sync_with_stdio(0); cin.tie(0);
+    int n, m; cin >> n >> m;
+
+    for(int i = 0; i < n; i++) {
+        pprev[i] = i;
+        sz   [i] = 1;
+    }
+
+    while( m-- ) {
+        char t; int u, v;
+        cin >> t;
+
+        if( t == '1' ) {
+            cin >> u >> v;
+            if( (u = get(u-1)) != (v = get(v-1)) ) unite(v, u);
+        }
+        else {
+            cin >> u;
+            int id1 = get(u-1);
+            cout << delta[u-1] + (u-1 != id1 ? delta[id1] : 0) << "\n";
+        }
+    }
+}
+```
+
+</details>
+
