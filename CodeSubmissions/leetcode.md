@@ -1,8 +1,4 @@
-<details>
-
-<summary> 3321. Find X-Sum of All K-Long Subarrays II </summary>
-
-ссылка: [[3321]](https://leetcode.com/problems/find-x-sum-of-all-k-long-subarrays-ii/description/)
+#### [3321. Find X-Sum of All K-Long Subarrays II](https://leetcode.com/problems/find-x-sum-of-all-k-long-subarrays-ii/description/)
 
 Определим **L-sum** массива как:
 
@@ -102,16 +98,13 @@ vector<long long> findXSum(vector<int>& a, int k, int LL) {
 
 </details>
 
-</details>
-
+---
 
 $\text{ }$
 
-<details>
 
-<summary> 2458. Height of Binary Tree After Subtree Removal Queries </summary>
-
-ссылка: [[2458]](https://leetcode.com/problems/height-of-binary-tree-after-subtree-removal-queries/description/) (нашёл эту задачу из [этого решения](https://leetcode.com/problems/longest-common-prefix-of-k-strings-after-removal/solutions/6539692/precomputations-by-fahad_mubeen-umch/) задачи 3485)
+#### [2458. Height of Binary Tree After Subtree Removal Queries](https://leetcode.com/problems/height-of-binary-tree-after-subtree-removal-queries/description/) 
+(нашёл эту задачу из [этого решения](https://leetcode.com/problems/longest-common-prefix-of-k-strings-after-removal/solutions/6539692/precomputations-by-fahad_mubeen-umch/) задачи 3485)
 
 Дано корневое дерево.\
 Требуется определить какой станет высота дерева после удаления $i$-ой вершины вместе со всем её поддеревом (удаления выполняются независимо).
@@ -159,4 +152,7 @@ vector<int> treeQueries(TreeNode* root, vector<int>& queries) {
 
 </details>
 
-</details>
+---
+
+$\text{ }$
+
