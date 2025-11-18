@@ -156,3 +156,99 @@ vector<int> treeQueries(TreeNode* root, vector<int>& queries) {
 
 $\text{ }$
 
+
+#### АДСКИ СЛОЖНАЯ РЕАЛИЗАЦИЯ
+
+Дан массив вида: $[a_1, \dots, a_n, b_1, \dots, b_n]$. \
+Надо переставить элементы чтобы получить: $[a_1, b_1, a_2, b_2, \dots, a_n, b_n]$.
+
+
+<details>
+
+<summary> O(N ln N) time, O(ln N) space </summary>
+
+Идейно разделяй и влавствуй: хотим "перемешать" отрезки $[l, r)$ и $[r, t)$ - для этого мы правую половину первого отрезка swap-аем с левой половиной второго отрезка. И затем вызываемся реккурсивно от половин.
+
+Убил на этот "merge" целый день..
+
+```cpp
+class Solution {
+public:
+    // [l, r) [r, t)
+    void recurse(vector<int>& a, int l, int r, int t) {
+        if( l >= r || r >= t ) return;
+
+        int l1 = r-l, l2 = t-r;
+        
+        if( l1 > l2 ) l++;
+        if( l1 < l2 ) t--;
+
+        int lcp = (t-r + 1)/2;
+        for(int i = 0; i < lcp; i++) {
+            swap( a[r-lcp + i], a[r+i] );
+        }
+
+        recurse(a, l, r-lcp, r);
+        recurse(a, r, r+lcp, t);
+    }
+
+    vector<int> shuffle(vector<int>& a, int n) {
+        recurse(a, 0, n, 2*n);
+
+        // наподгонял, но в конце получается массив вида:
+        //     [b1, a1, b2, a2, ...]
+        // поэтому ещё надо сделать этот цикл
+        for(int i = 0; i < 2*n; i += 2) {
+            swap( a[i], a[i+1] );
+        }
+        return a;
+    }
+};
+```
+
+</details>
+
+
+<details>
+
+<summary> O(N) time, O(1) space ?? </summary>
+
+Есть такое решение: [by Jump32Catch](https://leetcode.com/problems/shuffle-the-array/solutions/7190503/linear-in-place-shuffle-using-huang-lang-eg8q/), но я пока не разбирался.... <- TODO
+
+В общем там отсылается к: Huang–Langston: [Practical In-Place Merging (1988)](https://dl.acm.org/doi/pdf/10.1145/42392.42403)
+
+</details>
+
+
+---
+
+$\text{ }$
+
+
+#### [1526. Minimum Number of Increments on Subarrays to Form a Target Array](https://leetcode.com/problems/minimum-number-of-increments-on-subarrays-to-form-a-target-array/description)
+
+Требуется нулевой массив превратить в заданный массив `target` за минимальное число операций. \
+Одна операция это прибавить $+1$ на отрезке.
+
+<details>
+
+<summary> Решение </summary>
+
+![alt text](image-02.png)
+
+После этого рисунка очевидно что:
+```cpp
+int ans = 0, prev = 0;
+for(auto e : target) {
+    ans += max( 0, e - prev );
+    prev = e;
+}
+```
+
+</details>
+
+
+---
+
+$\text{ }$
+
