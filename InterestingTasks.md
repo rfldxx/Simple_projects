@@ -1164,6 +1164,422 @@ answer.pop_back();  // удаляем {0, -1}
 
 </details>
 
+UPD:
+<details>
+
+<summary> Компоненты вершинной двусвязности и точки сочленения </summary>
+
+
+
+Вершина - точка сочленения, если при её удалении граф перестает быть связным (прям как с мостами!!).
+
+![alt text](InterestingTasks_graph_components.png)
+
+
+Видно, что две вершины лежат в одной двусвязной компоненте - если есть цикл, содержащий эти вершины.
+
+<details>
+
+<summary> Первое решение </summary>
+
+Вообще треш, я почему-то решил что надо использовать $\text{bfs}$ в итоге и допинал его до норм решения.
+
+Сначала разбиваем вершины по уровням. \
+Будем использовать DSU: вершины из одной компоненты будут лежать в одном множестве $\alpha_i$.
+
+Теперь запускаемся снизу и смотрим что происходит с множествами при подъеме на один уровень вверх. Рассмотрим все "стрелки" вверх для всех вершин текущего уровня из множества $\alpha_i$:
+
+- все стрелки переходят только в одну вершину $r$: значит $r$ является точкой сочленения, и множество $\alpha_i$ больше не будет модифицироваться
+- иначе стрелки будут вести в несколько ($\ge 2$) вершин уровнем выше - и мы вливаем их в наше множество $\alpha_i$ (на этом шаге может произойти объединение разных множеств $\alpha_i$, $\alpha_j$)
+
+По сути, $\text{bfs}$ и запуск снизу гарантирует что ветви соединяться в $\text{root}$: то есть мы как бы уже задали половину цикла (и при подъеме снизу мы собираем "нижнюю" половину цикла).
+
+<details>
+
+<summary> треш код </summary>
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+
+// ===== [ DSU ] ==============================================================
+template<typename... AccounterTypes>
+struct DSU {
+    vector<int> pprev, sz;
+    tuple<AccounterTypes...> accounters;
+
+    template<size_t N>  // получения счетчиков
+    auto& accounter(int a) { return std::get<N>(accounters)[get(a)]; }
+
+    DSU(int n) : pprev(n), sz(n, 1), accounters(AccounterTypes(n)...) {
+        for(int i = 0; i < n; i++) pprev[i] = i;
+    }
+
+    int get(int a) { return pprev[a] == a ? a : pprev[a] = get(pprev[a]); }
+
+    int unite(int a, int b) {
+        int id1 = get(a), id2 = get(b);
+        if( id1 == id2 ) return id1;
+        
+        auto temp = pair{id1, id2};
+        if( sz[id1] < sz[id2] ) swap(id1, id2);
+        
+        sz[id1] += sz[id2];
+        pprev[id2] = id1;
+        
+        // вызываем .uniting() для каждого accounter-а
+        auto curr = pair{id1, id2};
+        std::apply( 
+            [curr, temp](auto&... args) { (args.uniting(curr, temp), ...); }, 
+            accounters
+        );
+
+        return id1;
+    }
+};
+// ============================================================================
+
+
+int n;
+vector<vector<int>> g;
+
+vector<vector<int>> prv;
+vector<vector<int>> layers;
+
+void bfs_build(auto& dsu) {
+    prv   .resize(n);
+    layers.resize(n);
+
+    vector<int> clr(n);
+    // 0 - необработана
+    // 1 - вершина на текущем уровне
+    // 2 - вершина уровнем ниже
+    // 3 - обработанна
+    
+    layers[0] = {0};
+    int h = 0;
+    while( !layers[h].empty() ) {
+        for(auto r : layers[h]) clr[r] = 1;
+
+        for(auto r : layers[h]) {
+            for(auto i : g[r]) {
+                if( clr[i] == 3 ) continue;
+
+                if( clr[i] == 1 ) {  // соединения на текущем уровне
+                    dsu.unite( i, r );
+                    continue;
+                }
+
+                if( !clr[i] ) layers[h+1].push_back( i );
+                clr[i] = 2;
+
+                prv[i].push_back( r );
+            }
+        }
+
+        for(auto r : layers[h]) clr[r] = 3;
+        h++;
+    }
+}
+
+int main() {
+    int m; cin >> n >> m;
+    g.resize(n);
+    
+    while( m-- ) {
+        int a, b; cin >> a >> b;
+        g[a-1].push_back( b-1 );
+        g[b-1].push_back( a-1 );
+    }
+
+    DSU dsu(n);
+    bfs_build(dsu);
+
+
+    // "циклично-связанные" компоненты
+    vector<vector<int>> teams(n);
+
+    vector<int> deads(n); //, killer(n, -1);
+
+    vector<int> active(n);
+    vector<pair<int, int>> call(n, {-1, -1});  // вместо cnt_arrows
+    vector<vector<int>>  arrows(n);  // могут быть повторения
+
+    for(int h = n-1; h >= 1; h--) {
+        vector<int> current;
+
+        // рассматриваем уровень h и смотрим указатели вверх
+        for(int i : layers[h]) {
+            int id = dsu.get(i);  // <- записываем в это множество
+            if( !active[id] ) current.push_back( id );
+            active[id] = 1;
+
+            for(int r : prv[i]) {
+                // записываем в call
+                     if( call[id].first == -1 ) call[id].first  = r;
+                else if( call[id].first !=  r ) call[id].second = r;
+
+                arrows[id].push_back( r );
+            }
+        }
+
+        for(auto id : current) {
+            if( call[id].second == -1 ) {  // завершаем множество "id"
+                deads[ call[id].first ] = 1;
+                teams[id] = { call[id].first };
+            } else {
+                for(auto r : arrows[id]) {
+                    dsu.unite( r, id );
+                }
+            }
+
+            active[id] = 0;
+            call  [id] = {-1, -1};
+            arrows[id].clear();
+        }
+    }
+
+    // проверка корня
+    int id0 = dsu.get( g[0][0] );
+    int is_ok = 1;
+    for(auto i : g[0])
+        is_ok &= dsu.get(i) == id0;
+
+    if( is_ok ) {  // "оправдываем" корень
+        deads[0] = 0;
+    }
+
+  
+    cout << "DEADS: ";
+    for(int i = 0; i < n; i++) if(deads[i]) cout << i << " ";
+    cout << endl;
+  
+
+    for(int i = 1; i < n; i++) {
+        teams[ dsu.get(i) ].push_back( i );
+    }
+
+    cout << "COMPONENTS:\n";
+    for(int id = 1; id < n; id++) 
+        if( !teams[id].empty() ) {
+            for(auto e : teams[id]) cout << e << " ";
+            cout << endl;
+        }
+    cout << endl;
+}
+```
+
+</details>
+
+Текущая версия использует DSU, но можно обойтись и без него. (Тогда при переходе между уровнями мы будим собирать все ребра в мини-граф и запускать для него какой-нибудь обход, например $\text{dfs}$. Потом аккуратно используем массив для индексирования и итого можно достичь: $O(n+m)$.)
+
+<details>
+
+<summary> (примерно так) </summary>
+
+В "итоговом" коде для соединений на текущем уровне использовалось `dsu.unite( i, r )`. \
+Это можно делать за линию:
+
+```cpp
+//    все вершины в same_on_layer[i] - из одной компоненты
+vector<vector<int>> same_on_layer;
+
+void connected_dfs(int r, const auto& g, auto& clr) {
+    clr[r] = 1;
+    same_on_layer.back().push_back( r );
+
+    for(auto i : g[r])
+        if( !clr[i] )
+            connected_dfs(i, g, clr);
+}
+
+void bfs_build() {
+    // выстраиваем bfs
+    prv   .resize(n);
+    nxt   .resize(n);
+    stops .resize(n);
+    layers.resize(n+1);
+
+    vector<int> lvl = {0};
+    vector<int> clr(n);
+    // 0 - необработана
+    // 1 - вершина на текущем уровне
+    // 2 - вершина уровнем ниже
+    // 3 - обработанна
+ 
+
+    // Для dfs-a внутри bfs-а
+    vector<bool>        extrav(n), extraclr(n);
+    vector<vector<int>> extrag(n);
+
+    int h = 0;
+    while( !lvl.empty() ) {
+        layers[h] = lvl;
+
+        vector<int> next_lvl;
+        vector<int> whitchv;
+
+        for(auto r : lvl) clr[r] = 1;
+
+        for(auto r : lvl) {
+            int added = 0;
+
+            for(auto i : g[r]) {
+                if( clr[i] == 3 ) continue;
+
+                if( clr[i] == 1 ) {  // соединения на текущем уровне
+                    // ребро i->r тоже будет рассмотренно на какой-то другой итерации
+                    if( extrav[r] == 0 ) whitchv.push_back( r );
+                    extrav[r] = 1;
+                    extrag[r].push_back( i );
+                    continue;
+                }
+
+                if( !clr[i] ) next_lvl.push_back( i );
+                clr[i] = 2;
+                added  = 1;
+
+                prv[i].push_back( r );
+                nxt[r].push_back( i );
+            }
+            
+            if( !added ) stops[h].push_back( r );
+        }
+
+        for(auto r : lvl) clr[r] = 3;
+
+
+        swap(lvl, next_lvl);
+        h++;
+        
+
+        // выполняем dfs для определения same_on_layer
+        for(auto r : whitchv) {
+            if( !extraclr[r] ) {
+                same_on_layer.push_back( {} );
+                connected_dfs(r, extrag, extraclr);
+            }
+        }
+
+        for(auto r : whitchv) {
+            extrav[r] = extraclr[r] = 0;
+            extrag[r].clear();
+        }
+    }
+}
+```
+
+Также есть проблема как делать "unite" при подъёме с нижнего уровня наверх? Там примерно похоже: запускаем dfs чтобы понять какие подъемы имеют общие вершины - и загоняем их под один id-ишник.
+
+</details>
+
+
+</details>
+
+$\text{ }$
+
+
+
+Узнав, что и эту задачу можно решить через $\text{dfs}$ - стал подгонять решение из поиска мостов.
+
+По сути мы так же прибавляем $+1$ на отрезке (правда на этот раз не включая начало). \
+При md-ешенье понял, что по сути и проверка таже - если ребёнок вернул сумму равную $0$ - то это мост / точка сочленения (просто реализовывал с нуля и забавно что в разных местах эти проверки).
+
+
+<details>
+
+<summary> Нормальный код </summary>
+
+Прикольно, как можно сразу найти компоненты: https://neerc.ifmo.ru/wiki/index.php?title=Построение_компонент_вершинной_двусвязности (Добавляем каждую вершину в ходе dfs в стек. Если компонента "закончилась", то она будет последовательно лежать на вершине стека, и нам остается её переложить.)
+
+Прикольно, как проверить является ли корень точкой сочленения: https://ru.algorithmica.org/cs/graph-traversals/bridges/ (Смотрим сколько было "независимых" ветвей dfs от него, если больше одной - значит это точка сочленения.)
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+int n;
+vector<vector<int>> g;
+
+vector<int> clr, delta, nxt;
+vector<bool> deads;
+
+stack<int> path;
+vector<vector<int>> components;
+
+int dfs(int curr, int prev) {
+    path.push(curr);
+    
+    clr[curr] = 1;
+    int sum   = 0;
+    int cnt_branches = 0;  // важно только для корня
+    for(auto i : g[curr]) {
+        if( i != prev && clr[i] != 2 ) {
+            cnt_branches++;
+
+            if( clr[i] == 1 ) {  // попали в ветку
+                delta[nxt[i]] -= 1;
+                sum++;
+                continue;
+            }
+
+            if( int child_sum = dfs( nxt[curr] = i, curr ) ) {  // находимся в компоненте связности
+                sum += child_sum;
+                continue; 
+            }
+
+            // curr - это конец компоненты связности
+            deads[curr] = 1;
+
+            components.push_back( {curr} );
+            auto& comp = components.back();
+            do {
+                comp.push_back( path.top() );
+                path.pop();
+            } while ( comp.back() != i );
+        }
+    }
+    clr[curr] = 2;
+
+    if( curr == 0 && cnt_branches == 1 ) deads[0] = 0;
+
+    return sum + delta[curr];
+}
+
+int main() {
+    int m; cin >> n >> m;
+    g.resize(n);
+
+    while( m-- ) {
+        int a, b; cin >> a >> b;
+        g[a-1].push_back( b-1 );
+        g[b-1].push_back( a-1 );
+    }
+
+
+    for(auto* pv : {&clr, &delta, &nxt}) pv->resize(n);
+    deads.resize(n);
+
+    dfs(0, 0);
+
+    
+    cout << "DEADS: ";
+    for(int i = 0; i < n; i++) if(deads[i]) cout << i << " ";
+
+    cout << "\nCOMPONENTS:\n";
+    for(auto vv : components) {
+        for(auto e : vv) cout << e << " ";
+        cout << endl;
+    }
+}
+```
+
+</details>
+
+
+</details>
+
 ---
 
 $\text{}$
