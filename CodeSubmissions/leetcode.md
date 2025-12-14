@@ -252,3 +252,85 @@ for(auto e : target) {
 
 $\text{ }$
 
+#### [Good Pairs](https://www.codechef.com/START38B/problems/GOODPAIRS)
+
+Дано два массива $A$ и $B$ одинакового размера $N$. \
+Найти количество пар $(i, j)$, $i < j$ таких что одновременно: $A[i] = B[j]$ и $A[j] = B[i]$.
+
+<details>
+
+<summary> Код решения</summary>
+
+Первая идея (прям по вайбу MapReduce про который я недавно прочитал):
+```cpp
+void solve(int n, const vector<int>& A, const vector<int>& B) {
+    map<int, map<int, int>> wa, wb;
+    
+    for(int i = 0; i < n; i++) {
+        wa[a[i]][b[i]]++;
+        wb[b[i]][a[i]]++;
+    }
+    
+    ll ans = 0;
+    for(const auto& [alpha, va] : wa) {
+        if( !wb.count(alpha) ) continue;
+        const auto& vb = wb[alpha];
+        
+        for(auto [betta, n1] : va) {
+            if( !vb.count(betta) ) continue;
+            int n2 = vb.at(betta);
+        
+            ans += alpha == betta ? 1LL* n1*(n1-1) : 1LL* n1*n2;
+        }
+    }
+    
+    cout << ans/2 << "\n";
+}
+```
+
+Доработанная первая идея:
+```cpp
+void solve(int n, const auto& A, const auto& B) {
+    map<pair<int, int>, pair<int, int>> w;
+    
+    for(int i = 0; i < n; i++) {
+        w[ {A[i], B[i]} ].first ++;
+        w[ {B[i], A[i]} ].second++;
+    }
+    
+    ll ans = 0;
+    for(auto [ab, nn] : w) {
+        auto [alpha, betta] = ab;
+        auto [n1, n2] = nn;
+        
+        ans += alpha == betta ? 1LL* n1*(n1-1) : 1LL* n1*n2;
+    }
+    
+    cout << ans/2 << "\n";
+}
+```
+
+Посмотрел "разбор" - и там просто очень простая и понятная идея!:
+```cpp
+void solve(int n, const auto& A, const auto& B) {
+    map<pair<int, int>, int> w;
+  
+    ll ans = 0;
+    while( n-- ) {  // экономим на for-ах
+        auto [a, b] = pair{ A[n], B[n] };
+        ans += w[ {b, a} ];
+        w[ {a, b} ]++;
+    }
+    
+    cout << ans << "\n";
+}
+```
+
+</details>
+
+
+
+---
+
+$\text{ }$
+
