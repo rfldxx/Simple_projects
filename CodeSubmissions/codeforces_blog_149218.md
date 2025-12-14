@@ -250,7 +250,7 @@ This will drop memory consumption to $40$ MiB, which is much better, and improve
 
 When doing this we, unfortunately, get into the territory of diminishing returns very quickly, as each prime number we add reduces the storage by a factor of $\frac{p−1}{p}$, which becomes increasingly negligent as we add more primes. At the same time, this significantly complicates the whole setup, because when we work with more than $1$ prime in the wheel, numbers that are co-prime with them become more irregular, and their period increases super-exponentially.
 
-As of now, for numbers up to $10^9$ the sweet spot appears to be in the $210$-wheel, composed of prime numbers ${2,3,5,7}$. It has $48$ numbers co-prime to the period of the wheel, meaning that we get a reduction of $\frac{210}{48} = 4.375$ for the storage.
+As of now, for numbers up to $10^9$ the sweet spot appears to be in the $210$-wheel, composed of prime numbers $\set{2,3,5,7}$. It has $48$ numbers co-prime to the period of the wheel, meaning that we get a reduction of $\frac{210}{48} = 4.375$ for the storage.
 
 Here are some utilities that I find useful when compressing storage using this wheel:
 
