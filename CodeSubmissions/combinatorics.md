@@ -85,8 +85,7 @@ $\text{ }$
 
 Обозначим за $\Delta_i$ детерминант усеченной матрицы. \
 Раскладываем детерминант полной матрицы $\Delta$ по нижней строке и получаем (просто забудем про минусы и как же хорошо что все знаки сошлись): \
-$\Delta = n \cdot n! + 1 \cdot \Delta_0 \cdot (n-1)! + 1 \cdot \Delta_1 \cdot (n-2)! + \dots + 1 \cdot \Delta_{n-3} \cdot 3! + n \cdot \Delta_{n-2} = $ \
-$ = n \cdot n! + \sum\limits_{k=0}^{n-3} \Delta_k \cdot (n-1-k)! + n \cdot \Delta_{n-2}$
+$\Delta = n \cdot n! + 1 \cdot \Delta_0 \cdot (n-1)! + 1 \cdot \Delta_1 \cdot (n-2)! + \dots + 1 \cdot \Delta_{n-3} \cdot 3! + n \cdot \Delta_{n-2} = n \cdot n! + \sum\limits_{k=0}^{n-3} \Delta_k \cdot (n-1-k)! + n \cdot \Delta_{n-2}$
 
 
 Детерминант $\Delta_k$ разложем по нижней строчке и получим реккурентное соотношение: \
@@ -96,7 +95,7 @@ $\Delta_0 = n$
 Видно что из всех $\Delta_k$ можно вынести $n$. Также давайте сразу поделим на детерминант первоначальной матрицы $n!$ (т.к. по методу Крамера: $T_n = \Delta / n!$).
 
 
-Поэтому в сумме будут слагаемые: $ A_k := \frac{\Delta_k \cdot (n-1-k)!}{n \cdot n!} $. Давай-те подставим реккурентную формулу для $\Delta_k$: \
+Поэтому в сумме будут слагаемые: $A_k := \frac{\Delta_k \cdot (n-1-k)!}{n \cdot n!}$. Давай-те подставим реккурентную формулу для $\Delta_k$: \
 $A_k = (k \cdot \frac{\Delta_{k-1}}{n} +  n (n-1) \dots (n+1 - k)) \cdot \frac{(n-1-k)!}{n!} = k \cdot \frac{\Delta_{k-1} \cdot (n-1-k)!}{n \cdot n!} + \frac{1}{n-k}$
 
 Итого: $A_k = \frac{k}{n-k} \cdot A_{k-1} + \frac{1}{n-k}$ , $A_0 = \frac{1}{n}$
