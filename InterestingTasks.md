@@ -1955,7 +1955,186 @@ int main() {
 
 </details>
 
+---
 
+$\text{}$
+$\text{}$
+
+
+[2222C. Разбиение по медиане](https://codeforces.com/contest/2222/problem/C)
+
+Вам дан массив $a$ нечётной длины $n$ ($n < 5000$), состоящий из целых положительных чисел. Требуется разбить массив на подмассивы нечётной длины так, чтобы все подмассивы имели одну и ту же медиану. Необходимо максимизировать количество таких подмассивов.
+
+Из прикольного можно найти медиану каждого подмассива за $O(n^2)$ (через связный список).
+
+<details>
+
+<summary> Решение </summary>
+
+Предположим что нам известно чему равны медианы `median[l][r]` для каждого подмассива $[a_l, ..., a_r]$. \
+Тогда давайте для каждого $x$ пробывать найти разбиение, в котором все медианы равны $x$. Рассмотрим $dp$ (подобно задаче о рюкзаке):
+* $dp[i]$ - на какое максимальное число подмассивов (каждый из которых имеет медиану $x$) можно разбить префикс $[a_1, a_2, ..., a_i]$. (если так разбить нельзя, то $dp[i] = -1$.)
+* Пусть медиана какого-то подмассива $[a_l, ..., a_r]$ равна $x$. Тогда, если $dp[l-1]$ можно разбить на поддмасивы с медианой $x$, то обновляем: $dp[r] = max( dp[r], dp[l-1] + 1 )$
+* Важно, чтобы при подсчете $dp[r]$ все прошлые значения $dp$ (на которые мы опираемся) уже были окончательно вычислены. Этого можно добиться перебирая подмассивы в порядке возрастания их правого конца $r$.
+
+Если нам известен `median[l][r]`, то суммарно такое $dp$ по всем $x$ можно сделать за $O(n^2)$.
+
+!!! Авторское решение: можно было заметить, что на самом деле $x$ может равняться только медиане **всего** массива $a$. И тогда нам нужно только: равна ли медиана подмассива $[a_l, ..., a_r]$ **определённому** $x$, что подсчитать проще. !!!
+
+
+Однако действительно возможно найти медину для каждого подмассива (`median[l][r]`) за $O(n^2)$. \
+(Если ограничиться $O(n^2 \ln n)$: то можно достаточно прямолинейно сделать через `pb_ds` или дерево Фенвика. В контесте, кстати, зашло только дерева Фенвика - так что видимо стоит забыть о `pb_ds`.)
+
+Мой комент с codeforces (лень переводить и так уже столько времени потратил на задачу, которую китайские пятикласники решают по прочтению):
+
+Let's maintain a frequency array, a pointer to the current median, and the number of elements strictly less than that median. When add new elements median moves by at most one position.
+
+So our goal effective find nearest non-zero value in frequency array (to move median). A naive scan require $O(n^3)$. So, for each element we need link to nearest non-zero neighbour – essentially maintaining a sorted linked list.
+
+Last, we need to find position to insert new value into this linked list. This can be precomputed: we looking for element which is closest to new value $a[r]$ among all elements in segment $[a_l,a_{l+1},...,a_{r−1}]$. The new value $a[r]$ will be "attached" to that element.
+
+![пример nearest_left при вставке a[r] на отрезке начиная с l](InterestingTasks_medians_for_each_subarray.png)
+
+
+Для удобство реализации я сжимаю координаты в: $a_i \in [1, n]$. В итоге $0$ в frequency array не задействуется и я использью его как фиктивное значения (как начало связного списка, которое никогда не меняется) (чтобы удобно было делать `insert`).
+
+Для вставки нового элемента я ищу ближайщего соседа слева (`nearest_left`) и вставляю новый элемент после него.
+
+Ещё забавно, что по сути у меня прям кольцевой связный список получился! (Из-за того что у всех элементов по умолчанию $nxt = 0$.)
+
+<details>
+
+<summary> Код </summary>
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+int pointer;
+int low = 0;
+int cnt[5002], prv[5002], nxt[5002];
+void reset_links(int n, int val) {
+    for(int i = 0; i <= n; i++) cnt[i] = prv[i] = nxt[i] = 0;
+
+    cnt[val] = 1;
+    prv[val] = 0;
+    nxt[0]   = val;
+    prv[0]   = val;  // <- лол, у нас прям кольцевой связный список получается!
+
+    pointer  = val;
+    low = 0;
+}
+
+void insert(int prev, int val) {
+    cnt[val]++;
+    low += (val < pointer);
+    
+    if( prev == val ) return;
+    int next = nxt[prev];
+
+    prv[ val] = prev;
+    nxt[prev] =  val;
+
+    nxt[ val] = next;
+    prv[next] =  val;
+}
+
+int get_by_order(int pos) {  // numeration from 1
+    while( low + cnt[pointer] < pos ) {
+        low    += cnt[pointer];
+        pointer = nxt[pointer];
+    }
+    while( low >= pos ) {
+        pointer = prv[pointer];
+        low    -= cnt[pointer];
+    }
+    return pointer;
+}
+
+
+int median[5002][5002];
+int     dp[5002][5002];
+void calculate_all_medians(vector<int>& a) {
+    int n = a.size();
+
+    // use "dp" as "nearest_left" (can't create new array because MLE)
+    for(int r = 1; r < n; r++) {
+        int near = 0;
+        for(int l = r-1; l >= 0; l--) {
+            if( a[l] <= a[r] && a[r] - a[l] < a[r] - near ) near = a[l]; 
+            dp[l][r] = near;
+        }
+    }
+
+    for(int l = 0; l < n; l++) {
+        reset_links(n, a[l]);
+        for(int r = l; r < n; r += 2) {
+            median[l][r] = get_by_order( (r-l+1)/2 + 1 );
+
+            if( r+2 < n ) {
+                insert( dp[l][r+1], a[r+1] );
+                insert( dp[l][r+2], a[r+2] );
+            }
+        }
+    }
+}
+
+
+vector<int> read_and_compress_coords(int n, int i_start);
+
+void solve() {
+    int n; cin >> n;
+    auto a = read_and_compress_coords(n, 1);
+
+    calculate_all_medians(a);
+
+    for(int x = 1; x <= n; x++) 
+        for(int i = 1; i <= n; i++)
+            dp[x][i] = -1;
+
+    // Process segments in increasing order of r
+    for(int r = 0; r < n; r++) {
+        for(int l = r; l >= 0; l -= 2) {
+            int x = median[l][r];
+
+            // In dp numerating of array indexes starts from 1
+            if( dp[x][l] == -1 ) continue;
+            dp[x][r+1] = max(dp[x][r+1], dp[x][l] + 1);
+        }
+    }
+
+    int ans = 0;
+    for(int x = 1; x <= n; x++) ans = max(ans, dp[x][n]);
+    cout << ans;
+}
+
+vector<int> read_and_compress_coords(int n, int i_start) {
+    vector<int> a(n);
+    set<int> was;
+    for(auto& e : a) {
+        cin >> e;
+        was.insert(e);
+    }
+
+    map<int, int> remap;
+    for(int i = i_start; auto e : was) remap[e] = i++;
+    
+    for(auto& e : a) e = remap[e];
+    return a;
+}
+
+int main() {
+    int t = 1; cin >> t;
+    while( t-- ) {
+        solve();
+        cout << "\n";
+    }
+}
+```
+
+</details>
+
+</details>
 
 ---
 
