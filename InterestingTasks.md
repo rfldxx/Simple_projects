@@ -2134,7 +2134,102 @@ int main() {
 
 </details>
 
+---
+
 </details>
+
+
+<details>
+
+<summary>ШОК: unroll циклов (by wery0)</summary>
+
+(Взято по: [CF round 1094](https://codeforces.com/blog/entry/153179) и его [Editorial](https://codeforces.com/blog/entry/153275). Все ники из codeforces: Kuro_neko, wery0, gloria_mundi.)
+
+Если искать ненулевое значение в frequency array итерируясь по всем элементам, то решение будет $O(n^3)$ - например если медиане надо будет прыгать от $1$ к $n$ и обратно, на входных данных: $1,n,n,1,1,n,n,...,1,1,2,3,...,n−1$ (концовка, чтобы координаты не сжимались).
+
+<details>
+
+<summary>Здесь будем рассматриваемый код:</summary>
+
+```cpp
+// by gloria_mundi
+#include <bits/stdc++.h>
+using namespace std;
+int main() {
+	cin.tie(nullptr); ios_base::sync_with_stdio(false);
+	int n_tests; cin >> n_tests;
+	for (int test = 0; test < n_tests; test++) {
+		int n; cin >> n;
+		vector<int> a(n);
+		for (int &x: a) cin >> x;
+		int m;
+		{
+			vector<int> compr = a;
+			ranges::sort(compr);
+			compr.erase(begin(ranges::unique(compr)), end(compr));
+			m = ssize(compr);
+			for (int &x: a) x = ranges::lower_bound(compr, x) - begin(compr);
+		}
+		vector<vector<int>> dp(n+1, vector<int>(m));
+		for (int i = 0; i < n; i++) {
+			auto &row = dp[i+1];
+			ranges::fill(row, -n);
+			vector<int> cnts(m);
+			int median = a[i];
+			int pcnt = 0, mpos = 0;
+			cnts[a[i]]++;
+			row[median] = dp[i][median] + 1;
+			for (int j = i; j >= 2; j -= 2) {
+				for (int x: {a[j-1], a[j-2]}) {
+					cnts[x]++;
+					if (x < median) pcnt++;
+				}
+				mpos++;
+				// pcnt <= mpos < pcnt + cnt[median]
+				while (pcnt <= mpos) pcnt += cnts[median++];
+				while (pcnt >  mpos) pcnt -= cnts[--median];
+				row[median] = max(row[median], dp[j-2][median] + 1);
+			}
+		}
+		cout << *ranges::max_element(dp.back()) << "\n";
+	}
+}
+```
+
+
+</details>
+
+
+Взлом (wery0 написал что потребуется $5.21 \cdot 10^9$ итераций):
+```
+1
+4999
+1 4999 4998 2 3 4997 4996 4 5 4995 4994 6 7 4993 4992 ...
+```
+
+В рассматриваемом коде отличается то как мы "расширяем" подмассив: здесь для каждого $r$ мы сдвигаем $l$ влево. А в решении выше рассматривалось: для каждого $l$ сдвигаем $r$ вправо. Но удивительным, оказалось, что рассматриваемый код сломал тест, который изначально задумывался именно для случая перемещения $r$ вправо. Т.е. по изначальной задумке, массив $a$ надо развернуть - но оказывется, что в этом случае потребуется даже чуть меньше времени!
+
+Ещё более удивительным оказалось, что рассматриваемый код может пройти тест - достаточно чуть-чуть заанроллить!
+
+Это работает за $1$ секунду! (submission: [372739341](https://codeforces.com/contest/2222/submission/372739341))
+```cpp
+// unroll cycle iterations
+while ( pcnt <= mpos ) {
+    pcnt   += cnts[median]   + cnts[median+1] + cnts[median+2] + ... + cnts[median+7];
+    median += 8;
+}
+while ( median >= 8 && pcnt > mpos ) {
+    pcnt   -= cnts[median-1] + cnts[median-2] + cnts[median-3] + ... + cnts[median-8];
+    median -= 8;
+}
+
+// fine tune iterations
+while (pcnt <= mpos) pcnt += cnts[median++];
+while (pcnt >  mpos) pcnt -= cnts[--median];
+```
+
+</details>
+
 
 ---
 
