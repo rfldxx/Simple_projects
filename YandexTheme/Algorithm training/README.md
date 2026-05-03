@@ -18,8 +18,8 @@
 [Таблица](https://yandex.ru/yaintern/training/results-algorithm-7) результатов.
 
 
-## [Забег по алгоритмам](https://yandex.ru/yaintern/training/algorithm-training-september-2025)
+## [Забег по алгоритмам](https://yandex.ru/yaintern/training/algorithm-training)
 
-<img src="Безымянный_8.png" alt="certificat.png" style="width:500px;"/>
+<img src="Безымянный_9.png" alt="certificat.png" style="width:500px;"/>
 
-[Таблица](https://yandex.ru/yaintern/training/results-algorithm-8) результатов.
+[Таблица](https://disk.yandex.ru/i/5NzvfVXuwmHNuA) результатов.
