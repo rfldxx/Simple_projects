@@ -269,9 +269,10 @@ main() {
 
 <details>
 	
-<summary>274 символа!</summary>
+<summary>266 символа!</summary>
 
-Решил перенести приравнивание `d[J] = D+W` из emplace в верхний if: `if( D == d[I] && d[I] = D )` - и откопал ещё одну жилу. В итоге всё утрамбовалось в:
+Решил перенести приравнивание `d[J] = D+W` из emplace в верхний if: `if( D == d[I] && d[I] = D )` - и откопал ещё одну жилу. В итоге всё ещё чуть утрамбовалось. \
+Ахахаха, я оказывается неправильно передставлял себе `set.end()` - в итоге можно снести последний элемент `{i, 1, j}` (спасибо deepseek).
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
@@ -280,7 +281,7 @@ main() {
     int n, i=2009000999, j; cin >> n >> j >> j;
 
     vector d(n, i);
-    set q { tuple{0, 0, j}, {i, 1, j} };
+    set q { tuple{0, 0, j} };
              
     map<int, int> e[n];
     while( cin >> i >> j >> n ) e[i][j] = e[j][i] = n;
@@ -288,7 +289,7 @@ main() {
     for(auto [D, _, I] : q)
         if( D < d[I] )
             for(d[I] = D; auto [J, W] : e[I])
-                q.emplace( D+W, ++_, J );
+                q.emplace( D+W, _+1, J );
    
     for(int e : d) cout << " " << e;
 }
