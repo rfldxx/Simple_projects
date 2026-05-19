@@ -207,7 +207,7 @@ $\text{}$
 
 <details>
 	
-<summary>305 символов</summary>
+<summary>305 символов (15.04.2025)</summary>
 	
 ```cpp
 #include<bits/stdc++.h>
@@ -227,6 +227,39 @@ main() {
             for(auto [J, W] : e[i])
                 if( n+W < d[J] )
                     q.emplace( d[J] = n+W, J );
+   
+    for(int e : d) cout << " " << e;
+}
+```
+
+</details>
+
+<details>
+	
+<summary>290 символов (ОМГ, год спустя: 19.05.2026)</summary>
+
+```cpp
+#include<bits/stdc++.h>
+using namespace std;
+
+main() {    
+    int n, i=2009000999, j; cin >> n >> j >> j;
+
+    vector d(n, i);
+
+    // В tuple центральное значение для упорядочивания - чтобы даже если было рассмотрено
+    // ребро нулевой длинны, мы добавляли "большее" значение чем текущее: q.emplace( d[J] = N+W, ++n, J );
+	// Также в range-based-for-loop end указатель подсчитывается сразу, поэтому добавляем: {i, 1, j}
+    set q { tuple{d[j]=0, 0, j}, {i, 1, j} };
+             
+    map<int, int> e[n];
+    while( cin >> i >> j >> n ) e[i][j] = e[j][i] = n;
+    
+    for(auto [D, _, I] : q)
+        if( D == d[I] )
+            for(auto [J, W] : e[I])
+                if( D+W < d[J] )
+                    q.emplace( d[J] = D+W, ++n, J );
    
     for(int e : d) cout << " " << e;
 }
