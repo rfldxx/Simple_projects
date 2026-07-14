@@ -1740,8 +1740,8 @@ $\text{}$
 using namespace std;
 
 bool extract_op(char wait, char neww) {
-    if( isalpha(wait) || isalpha(neww) ) return isalpha(wait);
-    if( neww == '(' || ( wait == '^' && neww == '^') ) return 0;
+    if( isalpha(wait) ) return 1;
+    if( isalpha(neww) || neww == '(' || ( wait == '^' && neww == '^') ) return 0;
 
     map<char, int> priory{ {'(', -2}, {')', -1}, {'+', 0}, {'-', 0}, {'*', 1}, {'/', 1}, {'^', 2} };
     return priory.at(wait) >= priory.at(neww);
